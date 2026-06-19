@@ -1,0 +1,15 @@
+{
+  "name": "whoop-spike",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Throwaway feasibility spike: OAuth into WHOOP and pull cycles/sleep/recovery.",
+  "scripts": {
+    "spike": "tsx whoop-spike.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.0"
+  }
+}
