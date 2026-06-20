@@ -5,7 +5,6 @@
 - Mobile-first
 - Fast and responsive
 - Accessible
-- Professional
 - Minimal visual clutter
 
 ## Theme
@@ -17,14 +16,11 @@
 ## Layout
 
 - Responsive
-- Sidebar on desktop
-- Bottom navigation on mobile
 
 ## Components
 
 - shadcn/ui
 - Lucide icons
-- Recharts
 
 ## Interaction
 

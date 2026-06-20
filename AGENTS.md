@@ -12,8 +12,6 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 1. `context/project-overview.md` — product definition, goals, core user flow, features, and scope
 2. `context/architecture-context.md` — stack, architectural pillars, system boundaries, and invariants
-3. `context/code-standards.md` — implementation rules and conventions
-4. `context/ai-workflow-rules.md` — development workflow, scoping rules, and delivery approach
 
 **Read when relevant to the change:**
 
