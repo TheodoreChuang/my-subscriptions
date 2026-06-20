@@ -7,7 +7,8 @@ export async function GET() {
     const report = await getReport(logger);
     reportSchema.parse(report);
     return Response.json(report);
-  } catch {
+  } catch (err) {
+    logger.error('GET /api/report failed', { err });
     return Response.json({ error: 'Internal error' }, { status: 500 });
   }
 }

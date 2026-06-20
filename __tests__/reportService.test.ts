@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { getReport } from '@/modules/report/reportService';
+import { getReport } from '@/modules';
 import { reportSchema } from '@/shared/schemas/report';
 
 const makeLogger = () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn() });
