@@ -1,0 +1,15 @@
+{
+  "name": "google-calendar-spike",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Throwaway feasibility spike: OAuth into Google and pull recent Calendar events.",
+  "scripts": {
+    "spike": "tsx google-calendar-spike.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.10.0"
+  }
+}
