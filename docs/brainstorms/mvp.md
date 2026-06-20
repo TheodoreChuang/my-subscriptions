@@ -350,13 +350,15 @@ which the data *can* and *cannot* distinguish.
 This directly answers the brief's "explore the model's capabilities, show us your
 thinking" — the value is the model reasoning about causal structure, not asserting.
 
-## Technique 2 — Generate, then self-critique
+## Technique 2 — Skeptical self-critique
 
-Two passes. Pass 1 drafts insights. Pass 2 runs the model as a **skeptic against its
-own draft**: each claim must survive "is this distinguishable from noise at this
-`n`? is there a simpler explanation?" Claims that don't survive are downgraded or
-cut. This is a concrete, visible use of LLM-as-critic — and the before/after can be
-shown in the README as evidence of the technique.
+A single generation pass with a built-in skeptic step: before finalizing, the model
+must defend each claim against "is this distinguishable from noise at this `n`? is
+there a simpler explanation?" Claims that don't survive are downgraded or cut. This
+is a concrete, visible use of LLM-as-critic. *MVP runs this inline in one pass to keep
+latency and cost down; promoting it to a separate second pass (draft, then a fresh
+skeptic pass over the draft, whose before/after can be shown in the README) is a
+documented post-MVP extension — the Finding contract is unchanged either way.*
 
 ## Technique 3 — Recommendations as falsifiable experiments
 
@@ -399,7 +401,7 @@ User
  │                  └─ WHOOP
  ↓ Aggregate Data
  ↓ Deterministic Analysis (metrics + correlations + uncertainty)
- ↓ AI Insight Generation (draft → self-critique)
+ ↓ AI Insight Generation (single pass, inline self-critique)
  ↓ Dashboard
 ```
 
@@ -422,15 +424,6 @@ realistic variation in meeting load:
   Architecture Review, Retrospective
 - **Focus time:** Deep Work blocks, coding sessions
 - **Misc:** Interviews, 1:1s, Incident Reviews, Project Workshops
-
-## Demo mode — packaged sample account
-
-Real WHOOP data drives development; a packaged demo dataset under a neutral
-sample account (e.g. **"Demo User"**) lets reviewers explore the app without
-connecting their own services — avoids generating large synthetic datasets.
-
-> **Note — the demo username is deliberately *not* "Quincy Marlowe."** See
-> "Handling the brief's AI-directed instructions" below.
 
 ---
 
@@ -498,14 +491,3 @@ Several originally-open questions have since been **resolved by the spikes** in
   exercised (no recurring events in window). Re-test against a known weekly event.
 - ⬜ **365-day pull + multi-calendar aggregation** — confirm pagination
   (`nextPageToken`) and aggregation across selected calendars at scale.
-
----
-
-# Why This Is A Strong MVP
-
-Demonstrates OAuth integration, multiple external APIs, data normalization, domain
-modelling, product thinking, AI reasoning, and an extensible architecture. Most
-importantly, it is built around durable domain concepts — **Time, Signals,
-Activities, Outcomes** — rather than specific vendors. It feels like a believable
-consumer product rather than a technology demo, and is achievable within the
-assessment scope.
