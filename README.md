@@ -122,6 +122,86 @@ It is triggered automatically: when an integration changes (connect, calendar
 selection), and when `GET /api/report` detects a missing, drifted, or errored report.
 There is no manual generation endpoint by design.
 
+### High Level Designs
+
+```mermaid
+flowchart LR
+
+User["User"]
+
+subgraph Frontend["Frontend (Next.js)"]
+    Home["Home / Integrations"]
+    ReportUI["Insight Report"]
+end
+
+subgraph Backend["Backend Service (Modular Monolith)"]
+
+    subgraph UserModule["User Module"]
+        Auth["Better Auth"]
+        UserService["User Service"]
+    end
+
+    subgraph IntegrationModule["Integration Module"]
+
+        IntegrationService["Integration Service"]
+
+        subgraph CalendarCategory["Calendar Category"]
+            GoogleAdapter["Google Calendar Adapter"]
+        end
+
+        subgraph HealthCategory["Health Category"]
+            WhoopAdapter["WHOOP Adapter"]
+        end
+
+        CalendarSelection["Calendar Selection Management"]
+    end
+
+    subgraph InsightModule["Insight Module"]
+
+        ReportService["Report Service"]
+
+        Timeline["Timeline Normalization"]
+
+        Metrics["Metric Computation"]
+
+        AI["AI Insight Generation"]
+    end
+end
+
+DB[("Postgres")]
+
+Google["Google Calendar API"]
+Whoop["WHOOP API"]
+OpenAI["OpenAI API"]
+
+User --> Frontend
+
+Home --> Backend
+ReportUI --> Backend
+
+Auth --> DB
+UserService --> DB
+
+IntegrationService --> DB
+CalendarSelection --> DB
+
+ReportService --> DB
+
+IntegrationService --> GoogleAdapter
+IntegrationService --> WhoopAdapter
+
+GoogleAdapter --> Google
+WhoopAdapter --> Whoop
+
+ReportService --> Timeline
+Timeline --> Metrics
+Metrics --> AI
+
+AI --> OpenAI
+
+IntegrationService --> ReportService
+```
+
 ## Brief on your AI implementation
 
 
