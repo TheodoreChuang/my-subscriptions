@@ -3,14 +3,13 @@
 ## Overview
 
 MySubscriptions connects a user's online services, normalizes their activity into a
-common timeline, and uses AI to surface insights that emerge **only when multiple
-sources are combined** — relationships no single-service dashboard can show. The MVP
-proves this with **Google Calendar** (how time is spent) and **WHOOP** (how the body
-responds), answering: *how does the way I schedule my life affect my recovery?*
+common timeline, and uses AI to surface insights. The MVP proves this with **Google Calendar** 
+(how time is spent) and **WHOOP** (how the body responds), answering: *how does the way I 
+schedule my life affect my recovery?*
 
 ## Goals
 
-1. Connect two real services via OAuth and fuse their data into one daily timeline.
+1. Connect one or more real services via OAuth and fuse their data into one daily timeline.
 2. Compute relationships deterministically (the AI never calculates numbers).
 3. Use AI to interpret those relationships honestly under small-sample uncertainty —
    the heart of the exercise.
@@ -23,9 +22,12 @@ responds), answering: *how does the way I schedule my life affect my recovery?*
    ones that reflect how the user actually spends time); the primary calendar is
    pre-selected, and the user can add their other owned calendars. Subscribed and
    shared calendars (holidays, birthdays, sports fixtures) are excluded as noise.
-3. Generate analysis: retrieve → normalize signals → compute metrics & correlations
-   → AI interpretation.
-4. View the report — Executive Summary, Analysis Dashboard, AI Insights.
+3. The report generates **automatically** — there is no "generate" button. The
+   pipeline (retrieve → normalize signals → compute metrics & correlations → AI
+   interpretation) runs as background work; the user sees a loading state on first
+   generation and the finished report when it lands.
+4. View the report — Executive Summary, Analysis Dashboard, AI Insights — over a
+   rolling last-30-days window (see **Report model**).
 
 **Connection tiers (encourage, don't force):** one service yields an honest
 single-source view (time allocation, or recovery trends) plus a prompt to connect
@@ -33,6 +35,48 @@ the second; two services unlock the cross-service correlations and AI insights t
 are the actual product. The relationship framing ("how your schedule affects
 recovery") is shown only when both sources are present — with one source the data
 exists but the correlation cannot be computed, so the UI must not imply it.
+
+## Report model
+
+**Report window — rolling last 30 days.** Every report is computed over the most
+recent 30 days. This window is deliberately short: it keeps the signal current, and
+it is *why* sample sizes are small — which is exactly the uncertainty the AI layer
+must reason honestly about rather than paper over.
+
+**A "day" is a calendar day — midnight to midnight in the user's timezone**, by real
+wall-clock time, not any one service's notion of a day. This is the canonical spine
+the timeline is keyed on: WHOOP cycles (which are physiological, not midnight-aligned)
+map onto the calendar day they mostly fall in, and calendar events join by their
+date. So "n = 26 days" on a report means 26 calendar days, uniformly across sources.
+
+**Generation is automatic, never manual.** The user never presses "generate." The
+report's existence is a function of the connected integration(s) and the clock:
+
+```txt
+No report exists        →  Generate automatically (show loading UI)
+Window has drifted      →  Regenerate automatically
+Integration changes     →  Regenerate automatically
+Report exists           →  Display immediately
+```
+
+- **No report exists** → generate from scratch; the user sees a loading state until
+  the first report lands.
+- **Window has drifted** → because the window is *rolling*, a report generated days
+  ago no longer covers a true last-30-days. When the app detects the window has moved
+  on (e.g. first open on a new day), it regenerates so the report stays honest to its
+  own label.
+- **Integration changes** → regenerate. An integration change is any change to the
+  inputs: connecting or disconnecting a service, *and* changing which calendars are
+  included. Both alter the underlying data, so both invalidate the current report.
+- **Report exists and is current** → display it immediately on open. When a
+  regeneration is triggered (below), the loading state shows until the refreshed
+  report is ready.
+
+A loading state is shown during report generation or regeneration.
+
+**One current report, overwritten in place.** There is exactly one report per user at
+a time; regeneration replaces it. Report history is a future enhancement (see Scope),
+so nothing here versions or retains past reports.
 
 ## Features
 
@@ -46,14 +90,17 @@ exists but the correlation cannot be computed, so the UI must not imply it.
 
 ### Deterministic analysis layer
 
-- Normalizes events and health cycles into daily summaries; computes activity
-  allocation, schedule-fragmentation metrics, and activity↔recovery correlations
-  with sample size and uncertainty. AI receives these metrics, never raw events.
+- Over the rolling last-30-days window, normalizes events and health cycles into
+  daily summaries; computes activity allocation, schedule-fragmentation metrics, and
+  activity↔recovery correlations with sample size and uncertainty. The short window
+  keeps samples small by design, so reporting that uncertainty is mandatory. AI
+  receives these metrics, never raw events.
 
 ### AI Insights
 
 - Interprets the deterministic layer with five techniques: competing hypotheses per
-  finding, a generate-then-self-critique pass, recommendations framed as falsifiable
+  finding, a skeptical self-critique that downgrades or cuts claims indistinguishable
+  from noise, recommendations framed as falsifiable
   experiments, explicit license to "find nothing," and calibrated confidence. Stance:
   honest interpretation under uncertainty, not confident storytelling.
 
@@ -87,7 +134,9 @@ exists but the correlation cannot be computed, so the UI must not imply it.
 
 ## Success Criteria
 
-1. A user connects both services and gets a generated report from their real data.
+1. A user connects one or more service(s) and a report over their real last-30-days data is
+   generated automatically — no manual "generate" step — and regenerates when an
+   integration or the window changes.
 2. Every surfaced number traces to the deterministic layer; the AI adds only
    interpretation, with sample size and confidence visible.
 3. The AI demonstrably declines to over-interpret weak signals rather than
