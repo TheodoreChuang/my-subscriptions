@@ -1,5 +1,9 @@
 # UI Context
 
+## Visual Designs
+
+- `docs/visual-designs` — when building or changing UI (design goals, theme, layout, components, interaction states)
+
 ## Design Goals
 
 - Mobile-first
