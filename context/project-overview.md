@@ -16,17 +16,21 @@ schedule my life affect my recovery?*
 
 ## Core User Flow
 
-1. Sign in; connect Google Calendar and/or WHOOP (OAuth). One service is enough to
-   start — the app encourages the second rather than forcing it.
-2. Choose which calendars to include. Only **owned** calendars are offered (the
+1. Sign in with Google (social login). This creates the account and is **identity
+   only** — it authenticates the user; it does *not* connect any data source.
+   Connecting Google Calendar for its data is a separate step (below), so a user can
+   sign in and then connect only WHOOP, only Calendar, or both.
+2. Connect Google Calendar and/or WHOOP (OAuth). One service is enough to start — the
+   app encourages the second rather than forcing it.
+3. Choose which calendars to include. Only **owned** calendars are offered (the
    ones that reflect how the user actually spends time); the primary calendar is
    pre-selected, and the user can add their other owned calendars. Subscribed and
    shared calendars (holidays, birthdays, sports fixtures) are excluded as noise.
-3. The report generates **automatically** — there is no "generate" button. The
+4. The report generates **automatically** — there is no "generate" button. The
    pipeline (retrieve → normalize signals → compute metrics & correlations → AI
-   interpretation) runs as background work; the user sees a loading state on first
-   generation and the finished report when it lands.
-4. View the report — Executive Summary, Analysis Dashboard, AI Insights — over a
+   interpretation) runs synchronously within the request — no job queue or cron; the
+   user sees a loading state while it runs and the finished report when it lands.
+5. View the report — Executive Summary, Analysis Dashboard, AI Insights — over a
    rolling last-30-days window (see **Report model**).
 
 **Connection tiers (encourage, don't force):** one service yields an honest
@@ -66,7 +70,7 @@ Report exists           →  Display immediately
   on (e.g. first open on a new day), it regenerates so the report stays honest to its
   own label.
 - **Integration changes** → regenerate. An integration change is any change to the
-  inputs: connecting or disconnecting a service, *and* changing which calendars are
+  inputs: connecting service, *and* changing which calendars are
   included. Both alter the underlying data, so both invalidate the current report.
 - **Report exists and is current** → display it immediately on open. When a
   regeneration is triggered (below), the loading state shows until the refreshed
