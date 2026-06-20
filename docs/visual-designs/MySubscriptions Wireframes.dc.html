@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; background: #18171A; }
+    * { box-sizing: border-box; }
+    @keyframes logoOrbit  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
+    @keyframes logoOrbit2 { from { transform: rotate(200deg); } to { transform: rotate(560deg);  } }
+    @keyframes logoPulse  { 0%,100% { opacity:.32; transform:scale(1);    } 50% { opacity:.9; transform:scale(1.07); } }
+    @keyframes logoRing   { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
+    @keyframes logoRingRev{ from { transform: rotate(0deg);   } to { transform: rotate(-360deg); } }
+    @keyframes barFill    { from { width: 6%; } to { width: 72%; } }
+  </style>
+</helmet>
+
+<div style="min-width: 100%; width: max-content; min-height: 100vh; background: #18171A; padding: 64px; font-family: 'Space Grotesk', sans-serif;">
+
+  <!-- PAGE HEADER -->
+  <div style="margin-bottom: 80px; max-width: 760px;">
+    <div style="font-family: 'Caveat', cursive; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: #FF6535; margin-bottom: 10px;">Wireframe Exploration · June 2026</div>
+    <div style="font-size: 44px; font-weight: 700; color: #F4EFE6; letter-spacing: -.025em; line-height: 1.05; margin-bottom: 10px;">MySubscriptions</div>
+    <div style="font-size: 15px; color: #F4EFE6; opacity: .3; margin-bottom: 28px;">Personal Insight Engine · Mobile-first · 4 screens · 2 integrations</div>
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 7px;">
+        <div style="width: 26px; height: 14px; background: #E0D9CE; border-radius: 3px;"></div>
+        <span style="font-family: 'Caveat', cursive; font-size: 14px; color: #555;">placeholder / chart</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 7px;">
+        <div style="width: 26px; height: 14px; border: 2px dashed #555; border-radius: 3px;"></div>
+        <span style="font-family: 'Caveat', cursive; font-size: 14px; color: #555;">needs action</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 7px;">
+        <div style="width: 26px; height: 14px; background: #FF6535; border-radius: 3px;"></div>
+        <span style="font-family: 'Caveat', cursive; font-size: 14px; color: #555;">primary CTA</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 7px;">
+        <div style="width: 26px; height: 14px; background: #6BCB77; border-radius: 3px; opacity: .8;"></div>
+        <span style="font-family: 'Caveat', cursive; font-size: 14px; color: #555;">connected / success</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       01 — ACCOUNT CREATION
+  ══════════════════════════════════════════════════ -->
+  <div style="margin-bottom: 96px;">
+    <div style="display: flex; align-items: baseline; gap: 14px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px; margin-bottom: 36px;">
+      <span style="font-family: 'Caveat', cursive; font-size: 36px; font-weight: 700; color: #FF6535; line-height: 1; min-width: 44px;">01</span>
+      <span style="font-size: 22px; font-weight: 600; color: #F4EFE6; letter-spacing: -.01em;">Account Creation</span>
+      <span style="font-family: 'Caveat', cursive; font-size: 16px; color: #494744;">↳ Google-only sign-in · 3 states</span>
+    </div>
+    <div style="display: flex; gap: 64px; align-items: flex-start;">
+
+      <!-- Welcome screen -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #2A2A2E; border: 1px solid #444; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #888; margin-bottom: 5px;">○ New user</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Welcome screen</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">first launch · Google is the only sign-in option</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; display: flex; flex-direction: column; padding: 28px 22px 24px;">
+              <!-- Logo lockup -->
+              <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 52px;">
+                <div style="position: relative; width: 32px; height: 32px; flex-shrink: 0;">
+                  <div style="position: absolute; inset: 0; border-radius: 50%; border: 1px dashed rgba(255,101,53,.35);"></div>
+                  <div style="position: absolute; top: -3px; left: 50%; transform: translateX(-50%); width: 7px; height: 7px; background: #FF6535; border-radius: 50%;"></div>
+                  <div style="position: absolute; inset: 8px; background: #1C1C1E; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <span style="font-size: 7px; font-weight: 800; color: #FF6535; font-family: 'Space Grotesk', sans-serif;">M</span>
+                  </div>
+                </div>
+                <span style="font-size: 13px; font-weight: 700; color: #1C1C1E; letter-spacing: -.01em;">MySubscriptions</span>
+              </div>
+              <!-- Hero -->
+              <div style="margin-bottom: 32px;">
+                <div style="font-size: 34px; font-weight: 800; color: #1C1C1E; letter-spacing: -.03em; line-height: 1.08; margin-bottom: 12px;">Your life,<br>decoded.</div>
+                <div style="font-size: 13px; color: #888; line-height: 1.6;">Connect your calendar and health data to unlock monthly insights that actually mean something.</div>
+              </div>
+              <!-- Google CTA — sole option -->
+              <div style="margin-top: auto; display: flex; flex-direction: column; gap: 14px;">
+                <div style="background: #fff; border: 1.5px solid #D4CCBC; border-radius: 13px; padding: 14px 18px; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.07);">
+                  <div style="width: 20px; height: 20px; border-radius: 4px; background: #fff; border: 1px solid #E0D9CE; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span style="font-size: 12px; font-weight: 900; font-family: Georgia, serif; background: linear-gradient(135deg,#4285F4,#EA4335); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">G</span>
+                  </div>
+                  <span style="font-size: 14px; font-weight: 700; color: #1C1C1E;">Continue with Google</span>
+                </div>
+                <div style="text-align: center;">
+                  <span style="font-size: 10px; color: #BBB; line-height: 1.7;">By continuing you agree to our <span style="text-decoration: underline; color: #999;">Terms</span> &amp; <span style="text-decoration: underline; color: #999;">Privacy Policy</span>.</span>
+                </div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Google is the sole option — no email/password clutter<br>✓ Value prop visible before committing<br>✓ Terms link reduces anxiety without demanding attention</div>
+          <div style="color: #888; margin-top: 4px;">→ Google button follows official brand guidelines (white bg)<br>→ Open Q: add example insight card as visual teaser?</div>
+        </div>
+      </div>
+
+      <!-- Google account picker sheet -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #E8F0FE; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #1A56DB; margin-bottom: 5px;">G System UI</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Google account sheet</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">OS-native bottom sheet · not custom UI · user picks account</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <!-- Dimmed app behind -->
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; padding: 28px 22px; opacity: .2;">
+              <div style="font-size: 34px; font-weight: 800; color: #1C1C1E; letter-spacing: -.03em; line-height: 1.08; margin-bottom: 12px;">Your life,<br>decoded.</div>
+              <div style="font-size: 13px; color: #888;">Connect your calendar and health data...</div>
+            </div>
+            <!-- Dim scrim -->
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; background: rgba(0,0,0,.22);"></div>
+            <!-- Bottom sheet -->
+            <div style="position: absolute; bottom: 28px; left: 0; right: 0; background: #fff; border-radius: 24px 24px 0 0; padding: 16px 18px 24px; box-shadow: 0 -8px 30px rgba(0,0,0,.2);">
+              <div style="width: 36px; height: 4px; background: #E0D9CE; border-radius: 2px; margin: 0 auto 16px;"></div>
+              <!-- Google header -->
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid #F0EBE3;">
+                <div style="width: 18px; height: 18px; border-radius: 3px; border: 1px solid #E0D9CE; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #4285F4; font-family: Georgia, serif; flex-shrink: 0;">G</div>
+                <span style="font-size: 13px; font-weight: 600; color: #1C1C1E;">Sign in to MySubscriptions</span>
+              </div>
+              <!-- Primary account -->
+              <div style="background: #F8F6F2; border-radius: 12px; padding: 11px 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 11px; border: 1.5px solid #4285F4;">
+                <div style="width: 36px; height: 36px; background: #FF6535; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; flex-shrink: 0;">J</div>
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">John Citizen</div>
+                  <div style="font-size: 11px; color: #888;">john@gmail.com</div>
+                </div>
+                <div style="margin-left: auto; width: 18px; height: 18px; border: 2px solid #4285F4; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  <div style="width: 9px; height: 9px; background: #4285F4; border-radius: 50%;"></div>
+                </div>
+              </div>
+              <!-- Use another -->
+              <div style="padding: 9px 13px; margin-bottom: 16px; display: flex; align-items: center; gap: 11px;">
+                <div style="width: 36px; height: 36px; border: 1.5px dashed #D4CCBC; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #AAA; flex-shrink: 0;">+</div>
+                <span style="font-size: 12px; color: #888;">Use another account</span>
+              </div>
+              <!-- CTA -->
+              <div style="background: #1C1C1E; border-radius: 12px; padding: 14px; text-align: center;">
+                <span style="font-size: 14px; font-weight: 700; color: #fff;">Continue as John →</span>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Native OS sheet — the trusted pattern for auth<br>✓ Pre-selected account cuts sign-in to a single tap<br>✓ "Use another account" covers edge case</div>
+          <div style="color: #888; margin-top: 4px;">→ This is the Google Identity SDK sheet — app has no control here<br>→ Appearance varies by OS version and Google app state</div>
+        </div>
+      </div>
+
+      <!-- Account created -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #E8F5E9; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #2E7D32; margin-bottom: 5px;">✓ Account created</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Welcome state</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">account ready · CTA bridges to service connection (→ 02)</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 32px 24px;">
+              <!-- Success mark -->
+              <div style="width: 72px; height: 72px; background: #6BCB77; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 22px; box-shadow: 0 8px 24px rgba(107,203,119,.28); flex-shrink: 0;">
+                <span style="font-size: 30px; color: #fff; line-height: 1; font-weight: 700;">✓</span>
+              </div>
+              <div style="font-size: 30px; font-weight: 800; color: #1C1C1E; letter-spacing: -.03em; line-height: 1.1; text-align: center; margin-bottom: 10px;">Welcome,<br>John.</div>
+              <div style="font-size: 13px; color: #888; line-height: 1.6; text-align: center; margin-bottom: 28px;">Account created with Google.<br>Now connect your first service to begin.</div>
+              <!-- Account badge -->
+              <div style="background: #EEE9DF; border-radius: 20px; padding: 6px 14px 6px 8px; display: flex; align-items: center; gap: 8px; margin-bottom: 32px;">
+                <div style="width: 24px; height: 24px; background: #FF6535; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; color: #fff; flex-shrink: 0;">J</div>
+                <span style="font-size: 11px; color: #666;">john@gmail.com</span>
+              </div>
+              <!-- CTA -->
+              <div style="width: 100%; background: #FF6535; border-radius: 13px; padding: 14px; text-align: center;">
+                <div style="font-size: 14px; font-weight: 700; color: #fff;">Connect your first service →</div>
+                <div style="font-size: 10px; color: rgba(255,255,255,.75); margin-top: 2px;">Next: Google Calendar or WHOOP</div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Confirms identity with Google account badge<br>✓ Bridges cleanly to service connection (→ 02)<br>✓ Single CTA — nothing to configure here</div>
+          <div style="color: #888; margin-top: 4px;">→ Returning users skip entirely → straight to 02 or report<br>→ Keep this brief — don't linger</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       02 — ONBOARDING & OAUTH
+  ══════════════════════════════════════════════════ -->
+  <div style="margin-bottom: 96px;">
+    <div style="display: flex; align-items: baseline; gap: 14px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px; margin-bottom: 36px;">
+      <span style="font-family: 'Caveat', cursive; font-size: 36px; font-weight: 700; color: #FF6535; line-height: 1; min-width: 44px;">02</span>
+      <span style="font-size: 22px; font-weight: 600; color: #F4EFE6; letter-spacing: -.01em;">Onboarding &amp; OAuth</span>
+      <span style="font-family: 'Caveat', cursive; font-size: 16px; color: #494744;">↳ service gallery (confirmed) · 4 connection states</span>
+    </div>
+    <div style="display: flex; gap: 64px; align-items: flex-start;">
+
+      <!-- Service gallery — connection states -->
+
+      <!-- STATE 0: Nothing connected -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #2A2A2E; border: 1px solid #444; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #888; margin-bottom: 5px;">○ Nothing connected</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Initial state</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">fresh install · no services yet</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; overflow: hidden; padding: 14px 18px;">
+              <div style="font-size: 24px; font-weight: 700; color: #1C1C1E; line-height: 1.15; margin-bottom: 4px;">Connect<br>your world.</div>
+              <div style="font-size: 10px; color: #AAA; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 16px;">Connect any service to begin</div>
+              <div style="border: 2px dashed #D4CCBC; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <div style="width: 34px; height: 34px; background: #EEE9DF; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">📅</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">Google Calendar</div>
+                    <div style="font-size: 10px; color: #AAA; margin-top: 1px;">Read-only · events &amp; durations</div>
+                  </div>
+                </div>
+                <div style="background: #1C1C1E; border-radius: 10px; padding: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #fff;">Connect with Google →</div>
+              </div>
+              <div style="border: 2px dashed #D4CCBC; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <div style="width: 34px; height: 34px; background: #EEE9DF; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">💪</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">WHOOP</div>
+                    <div style="font-size: 10px; color: #AAA; margin-top: 1px;">Recovery · sleep · strain</div>
+                  </div>
+                </div>
+                <div style="background: #1C1C1E; border-radius: 10px; padding: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #fff;">Connect with WHOOP →</div>
+              </div>
+
+              <div style="background: #EEE9DF; border-radius: 10px; padding: 8px 11px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 4px;">
+                  <div style="width: 16px; height: 16px; background: #6BCB77; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; flex-shrink: 0; font-weight: 700;">1</div>
+                  <span style="font-size: 11px; color: #444;">1 service → time or recovery view</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 7px;">
+                  <div style="width: 16px; height: 16px; background: #FF6535; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; flex-shrink: 0; font-weight: 700;">2</div>
+                  <span style="font-size: 11px; color: #444;">Both → schedule ↔ recovery insights</span>
+                </div>
+              </div>
+              <div style="background: #FF6535; border-radius: 13px; padding: 12px; text-align: center; opacity: .3;">
+                <div style="font-size: 14px; font-weight: 700; color: #fff;">Get started →</div>
+                <div style="font-size: 10px; color: rgba(255,255,255,.8); margin-top: 2px;">Connect a service above</div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Both cards visible — user sees the full picture<br>✓ Roadmap builds confidence</div>
+          <div style="color: #888; margin-top: 4px;">→ Neither button is primary yet<br>→ Consider Calendar first (more universal)</div>
+        </div>
+      </div>
+
+      <!-- Calendar picker step -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #E8F0FE; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #1A56DB; margin-bottom: 5px;">📅 Post-OAuth step</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Calendar picker</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">appears after Google OAuth · user selects which calendars to include</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; overflow: hidden; padding: 14px 18px;">
+              <!-- Nav -->
+              <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                <span style="font-size: 15px; color: #888;">←</span>
+                <span style="font-size: 14px; font-weight: 600; color: #1C1C1E;">Connect Calendar</span>
+              </div>
+              <!-- Heading -->
+              <div style="font-size: 22px; font-weight: 800; color: #1C1C1E; line-height: 1.2; margin-bottom: 6px;">Which calendars<br>to include?</div>
+              <div style="font-size: 12px; color: #888; line-height: 1.5; margin-bottom: 20px;">We only read event titles and durations — nothing else.</div>
+              <!-- John Citizen — primary, always included -->
+              <div style="background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.06); display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 20px; height: 20px; background: #6BCB77; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 800; flex-shrink: 0;">✓</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">John Citizen</div>
+                    <div style="font-size: 10px; color: #AAA; margin-top: 1px;">Primary calendar</div>
+                  </div>
+                </div>
+                <div style="font-size: 9px; color: #AAA; background: #EEE9DF; border-radius: 4px; padding: 2px 7px; font-weight: 700; letter-spacing: .04em;">Always included</div>
+              </div>
+              <!-- Work — unchecked, user adds -->
+              <div style="background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.06); display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 20px; height: 20px; border: 2px solid #E0D9CE; border-radius: 5px; flex-shrink: 0;"></div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">Work</div>
+                    <div style="font-size: 10px; color: #AAA; margin-top: 1px;">My calendars</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Family — unchecked -->
+              <div style="background: #fff; border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0,0,0,.06); display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div style="width: 20px; height: 20px; border: 2px solid #E0D9CE; border-radius: 5px; flex-shrink: 0;"></div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">Family</div>
+                    <div style="font-size: 10px; color: #AAA; margin-top: 1px;">My calendars</div>
+                  </div>
+                </div>
+              </div>
+              <!-- Holidays — system, excluded -->
+              <div style="background: #F5F0E8; border-radius: 12px; padding: 10px 14px; margin-bottom: 22px; display: flex; align-items: center; gap: 10px; opacity: .5;">
+                <div style="width: 20px; height: 20px; border: 2px dashed #D4CCBC; border-radius: 5px; flex-shrink: 0;"></div>
+                <div>
+                  <div style="font-size: 13px; font-weight: 600; color: #888;">US Holidays</div>
+                  <div style="font-size: 10px; color: #AAA; margin-top: 1px;">System calendar · not included</div>
+                </div>
+              </div>
+              <!-- CTA -->
+              <div style="background: #FF6535; border-radius: 13px; padding: 14px; text-align: center;">
+                <div style="font-size: 14px; font-weight: 700; color: #fff;">Save &amp; continue →</div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Primary always included — no empty state risk<br>✓ User opts in to additional calendars (less noise by default)<br>✓ System calendars excluded (holidays, birthdays add no signal)</div>
+          <div style="color: #888; margin-top: 4px;">→ Show calendar colour dot next to name for recognition<br>→ Open Q: should Work be pre-checked given it's common?</div>
+        </div>
+      </div>
+
+      <!-- STATE 1: Calendar connected -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #E8F0FE; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #1A56DB; margin-bottom: 5px;">📅 Calendar connected</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">1 of 2 connected</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">can proceed · WHOOP encouraged</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; overflow: hidden; padding: 14px 18px;">
+              <div style="font-size: 24px; font-weight: 700; color: #1C1C1E; line-height: 1.15; margin-bottom: 4px;">Connect<br>your world.</div>
+              <div style="font-size: 10px; color: #AAA; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 14px;">1 of 2 connected</div>
+              <div style="background: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,.07);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 34px; height: 34px; background: #E8F0FE; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">📅</div>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">Google Calendar</div>
+                      <div style="font-size: 10px; color: #6BCB77; font-weight: 700; margin-top: 1px;">✓ Connected</div>
+                    </div>
+                  </div>
+                  <span style="font-size: 11px; color: #AAA; border: 1px solid #E0D9CE; border-radius: 6px; padding: 3px 8px;">Edit</span>
+                </div>
+                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                  <span style="background: #E8F5E9; border-radius: 20px; padding: 3px 9px; font-size: 10px; color: #2E7D32; font-weight: 700;">✓ Personal</span>
+                  <span style="background: #E8F5E9; border-radius: 20px; padding: 3px 9px; font-size: 10px; color: #2E7D32; font-weight: 700;">✓ Work</span>
+                  <span style="background: #EEE9DF; border-radius: 20px; padding: 3px 9px; font-size: 10px; color: #AAA;">○ Holidays</span>
+                </div>
+              </div>
+              <div style="border: 2px dashed #D4CCBC; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <div style="width: 34px; height: 34px; background: #EEE9DF; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">💪</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">WHOOP</div>
+                    <div style="font-size: 10px; color: #AAA; margin-top: 1px;">Recovery · sleep · strain</div>
+                  </div>
+                </div>
+                <div style="background: #1C1C1E; border-radius: 10px; padding: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #fff;">Connect with WHOOP →</div>
+              </div>
+
+              <div style="background: #EEE9DF; border-radius: 10px; padding: 8px 11px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 4px;">
+                  <div style="width: 16px; height: 16px; background: #6BCB77; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; flex-shrink: 0; font-weight: 700;">✓</div>
+                  <span style="font-size: 11px; color: #444;">Time allocation view ready</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 7px;">
+                  <div style="width: 16px; height: 16px; background: #E0D9CE; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #AAA; flex-shrink: 0;">+</div>
+                  <span style="font-size: 11px; color: #AAA;">Add WHOOP → recovery correlations</span>
+                </div>
+              </div>
+              <div style="background: #FF6535; border-radius: 13px; padding: 12px; text-align: center;">
+                <div style="font-size: 14px; font-weight: 700; color: #fff;">Start with Calendar →</div>
+                <div style="font-size: 10px; color: rgba(255,255,255,.8); margin-top: 2px;">Add WHOOP later for full insights</div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ User can proceed immediately<br>✓ Tier card shows exactly what they're missing</div>
+          <div style="color: #888; margin-top: 4px;">→ Calendar selection (Personal + Work) shown as default<br>→ CTA sets expectations for what comes next</div>
+        </div>
+      </div>
+
+      <!-- STATE 2: WHOOP connected -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #F3E8FF; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #7C3AED; margin-bottom: 5px;">💪 WHOOP connected</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">1 of 2 connected</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">can proceed · Calendar encouraged</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; overflow: hidden; padding: 14px 18px;">
+              <div style="font-size: 24px; font-weight: 700; color: #1C1C1E; line-height: 1.15; margin-bottom: 4px;">Connect<br>your world.</div>
+              <div style="font-size: 10px; color: #AAA; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 14px;">1 of 2 connected</div>
+              <div style="border: 2px dashed #D4CCBC; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                  <div style="width: 34px; height: 34px; background: #EEE9DF; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">📅</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">Google Calendar</div>
+                    <div style="font-size: 10px; color: #AAA; margin-top: 1px;">Read-only · events &amp; durations</div>
+                  </div>
+                </div>
+                <div style="background: #1C1C1E; border-radius: 10px; padding: 10px; text-align: center; font-size: 12px; font-weight: 700; color: #fff;">Connect with Google →</div>
+              </div>
+              <div style="background: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.07);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 34px; height: 34px; background: #F3E8FF; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">💪</div>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">WHOOP</div>
+                      <div style="font-size: 10px; color: #6BCB77; font-weight: 700; margin-top: 1px;">✓ Connected</div>
+                    </div>
+                  </div>
+                  <span style="font-size: 11px; color: #AAA; border: 1px solid #E0D9CE; border-radius: 6px; padding: 3px 8px;">Edit</span>
+                </div>
+                <div style="font-size: 10px; color: #888;">Recovery · sleep · strain synced</div>
+              </div>
+
+              <div style="background: #EEE9DF; border-radius: 10px; padding: 8px 11px; margin-bottom: 10px;">
+                <div style="display: flex; align-items: center; gap: 7px; margin-bottom: 4px;">
+                  <div style="width: 16px; height: 16px; background: #6BCB77; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; flex-shrink: 0; font-weight: 700;">✓</div>
+                  <span style="font-size: 11px; color: #444;">Recovery &amp; sleep view ready</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 7px;">
+                  <div style="width: 16px; height: 16px; background: #E0D9CE; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #AAA; flex-shrink: 0;">+</div>
+                  <span style="font-size: 11px; color: #AAA;">Add Calendar → schedule correlations</span>
+                </div>
+              </div>
+              <div style="background: #FF6535; border-radius: 13px; padding: 12px; text-align: center;">
+                <div style="font-size: 14px; font-weight: 700; color: #fff;">Start with WHOOP →</div>
+                <div style="font-size: 10px; color: rgba(255,255,255,.8); margin-top: 2px;">Add Calendar later for full insights</div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ WHOOP user gets an immediate useful view<br>✓ Tier shows what Calendar adds</div>
+          <div style="color: #888; margin-top: 4px;">→ Less common path but fully valid<br>→ Recovery % field is WHOOP-specific (see note in 06)</div>
+        </div>
+      </div>
+
+      <!-- STATE 3: Both connected -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #E8F5E9; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #2E7D32; margin-bottom: 5px;">✓ Both connected</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Ready to go</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">full insights unlocked · nothing left to do</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; overflow: hidden; padding: 14px 18px;">
+              <div style="font-size: 24px; font-weight: 700; color: #1C1C1E; line-height: 1.15; margin-bottom: 4px;">Connect<br>your world.</div>
+              <div style="font-size: 10px; color: #6BCB77; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 14px;">All set ✓</div>
+              <div style="background: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 6px rgba(0,0,0,.07);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 9px;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 34px; height: 34px; background: #E8F0FE; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">📅</div>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">Google Calendar</div>
+                      <div style="font-size: 10px; color: #6BCB77; font-weight: 700; margin-top: 1px;">✓ Connected</div>
+                    </div>
+                  </div>
+                  <span style="font-size: 11px; color: #AAA; border: 1px solid #E0D9CE; border-radius: 6px; padding: 3px 8px;">Edit</span>
+                </div>
+                <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                  <span style="background: #E8F5E9; border-radius: 20px; padding: 3px 9px; font-size: 10px; color: #2E7D32; font-weight: 700;">✓ Personal</span>
+                  <span style="background: #E8F5E9; border-radius: 20px; padding: 3px 9px; font-size: 10px; color: #2E7D32; font-weight: 700;">✓ Work</span>
+                  <span style="background: #EEE9DF; border-radius: 20px; padding: 3px 9px; font-size: 10px; color: #AAA;">○ Holidays</span>
+                </div>
+              </div>
+              <div style="background: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 14px; box-shadow: 0 1px 6px rgba(0,0,0,.07);">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 34px; height: 34px; background: #F3E8FF; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;">💪</div>
+                    <div>
+                      <div style="font-size: 13px; font-weight: 700; color: #1C1C1E;">WHOOP</div>
+                      <div style="font-size: 10px; color: #6BCB77; font-weight: 700; margin-top: 1px;">✓ Connected</div>
+                    </div>
+                  </div>
+                  <span style="font-size: 11px; color: #AAA; border: 1px solid #E0D9CE; border-radius: 6px; padding: 3px 8px;">Edit</span>
+                </div>
+              </div>
+
+              <div style="background: #FF6535; border-radius: 13px; padding: 15px; text-align: center;">
+                <div style="font-size: 15px; font-weight: 800; color: #fff;">Analyze last 30 days →</div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ No tier display — both connected, nothing to explain<br>✓ CTA is clean — no caveats, just the action</div>
+          <div style="color: #888; margin-top: 4px;">→ Consider date range selector here (default: 30 days)<br>→ Target state after first-time setup</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       05 — LOADING SCREEN
+  ══════════════════════════════════════════════════ -->
+  <div style="margin-bottom: 96px;">
+    <div style="display: flex; align-items: baseline; gap: 14px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px; margin-bottom: 36px;">
+      <span style="font-family: 'Caveat', cursive; font-size: 36px; font-weight: 700; color: #60A5FA; line-height: 1; min-width: 44px;">03<br></span>
+      <span style="font-size: 22px; font-weight: 600; color: #F4EFE6; letter-spacing: -.01em;">Loading Screen</span>
+      <span style="font-family: 'Caveat', cursive; font-size: 16px; color: #494744;">↳ animated logo · orbit motif · animation is live ↓</span>
+    </div>
+    <div style="display: flex; gap: 64px; align-items: flex-start;">
+
+      <!-- FRAME A: Initial load -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #2A2A2E; border: 1px solid #444; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #888; margin-bottom: 5px;">⟳ Initial load</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Animated logo</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">first launch or returning · each orbit dot = one connected service</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #18171A; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,.35);">9:41</span>
+              <span style="font-size: 10px; color: rgba(255,255,255,.2); padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px;">
+              <div style="position: relative; width: 96px; height: 96px; flex-shrink: 0;">
+                <div style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px dashed rgba(255,101,53,.18); animation: logoRing 18s linear infinite;"></div>
+                <div style="position: absolute; inset: 11px; border-radius: 50%; border: 1px solid rgba(255,101,53,.06); animation: logoRingRev 28s linear infinite;"></div>
+                <div style="position: absolute; top: 50%; left: 50%; width: 0; height: 0; animation: logoOrbit 4.8s linear infinite;">
+                  <div style="position: absolute; width: 10px; height: 10px; background: #FF6535; border-radius: 50%; left: 37px; top: -5px; box-shadow: 0 0 10px rgba(255,101,53,.75);"></div>
+                </div>
+                <div style="position: absolute; top: 50%; left: 50%; width: 0; height: 0; animation: logoOrbit2 7.2s linear infinite;">
+                  <div style="position: absolute; width: 8px; height: 8px; background: #6BCB77; border-radius: 50%; left: 26px; top: -4px; box-shadow: 0 0 8px rgba(107,203,119,.65);"></div>
+                </div>
+                <div style="position: absolute; inset: 22px; background: #1F1E22; border-radius: 50%; border: 1.5px solid rgba(255,101,53,.32); display: flex; align-items: center; justify-content: center; animation: logoPulse 3.2s ease-in-out infinite;">
+                  <span style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 800; color: #FF6535; letter-spacing: -.04em;">M</span>
+                </div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 17px; font-weight: 700; color: #F4EFE6; letter-spacing: -.02em; margin-bottom: 6px;">MySubscriptions</div>
+                <div style="font-size: 9px; color: rgba(244,239,230,.18); letter-spacing: .12em; text-transform: uppercase;">Personal Insight Engine</div>
+              </div>
+              <div style="display: flex; gap: 7px; align-items: center; margin-top: -8px;">
+                <div style="width: 5px; height: 5px; background: rgba(255,101,53,.55); border-radius: 50%; animation: logoPulse 1.5s ease-in-out 0s infinite;"></div>
+                <div style="width: 5px; height: 5px; background: rgba(255,101,53,.55); border-radius: 50%; animation: logoPulse 1.5s ease-in-out .3s infinite;"></div>
+                <div style="width: 5px; height: 5px; background: rgba(255,101,53,.55); border-radius: 50%; animation: logoPulse 1.5s ease-in-out .6s infinite;"></div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: rgba(255,255,255,.12); border-radius: 3px;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Dark canvas — premium, unhurried<br>✓ Orange "M" core = brand anchor<br>✓ Orange dot = Calendar · Green = WHOOP — both orbit live</div>
+          <div style="color: #888; margin-top: 4px;">→ Dot count scales with # connected services<br>→ Name fades in after ~1s settle<br>→ Open Q: use as app icon?</div>
+        </div>
+      </div>
+
+      <!-- FRAME B: Analysis in progress -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #2A2A2E; border: 1px solid #444; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #888; margin-bottom: 5px;">⟳ Analysis running</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Analysis in progress</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">after "Analyze 30 days →" · 15–30s · progress + teaser</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #18171A; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: rgba(255,255,255,.35);">9:41</span>
+              <span style="font-size: 10px; color: rgba(255,255,255,.2); padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 0 28px;">
+              <div style="position: relative; width: 64px; height: 64px; flex-shrink: 0;">
+                <div style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px dashed rgba(255,101,53,.18); animation: logoRing 18s linear infinite;"></div>
+                <div style="position: absolute; top: 50%; left: 50%; width: 0; height: 0; animation: logoOrbit 4.8s linear infinite;">
+                  <div style="position: absolute; width: 8px; height: 8px; background: #FF6535; border-radius: 50%; left: 24px; top: -4px; box-shadow: 0 0 7px rgba(255,101,53,.7);"></div>
+                </div>
+                <div style="position: absolute; top: 50%; left: 50%; width: 0; height: 0; animation: logoOrbit2 7.2s linear infinite;">
+                  <div style="position: absolute; width: 6px; height: 6px; background: #6BCB77; border-radius: 50%; left: 18px; top: -3px; box-shadow: 0 0 6px rgba(107,203,119,.6);"></div>
+                </div>
+                <div style="position: absolute; inset: 15px; background: #1F1E22; border-radius: 50%; border: 1.5px solid rgba(255,101,53,.3); display: flex; align-items: center; justify-content: center; animation: logoPulse 3.2s ease-in-out infinite;">
+                  <span style="font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 800; color: #FF6535;">M</span>
+                </div>
+              </div>
+              <div style="text-align: center; width: 100%;">
+                <div style="font-size: 15px; font-weight: 700; color: #F4EFE6; margin-bottom: 12px;">Analyzing your June…</div>
+                <div style="text-align: left; background: rgba(255,255,255,.03); border-radius: 10px; padding: 11px 14px; margin-bottom: 16px;">
+                  <div style="font-size: 11px; color: rgba(255,255,255,.3); line-height: 1.9;">
+                    <div>Reading 847 calendar events <span style="color: #6BCB77; font-weight: 700;">✓</span></div>
+                    <div>Crunching 26 nights of data <span style="color: #6BCB77; font-weight: 700;">✓</span></div>
+                    <div>Running correlations <span style="color: rgba(255,255,255,.2);">⟳</span></div>
+                  </div>
+                </div>
+                <div style="background: rgba(255,255,255,.07); border-radius: 4px; height: 4px; overflow: hidden; margin-bottom: 7px;">
+                  <div style="width: 72%; height: 100%; background: #FF6535; border-radius: 4px; animation: barFill 2.4s cubic-bezier(.25,.46,.45,.94) forwards;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                  <span style="font-size: 10px; color: rgba(255,255,255,.2);">72%</span>
+                  <span style="font-size: 10px; color: rgba(255,255,255,.16);">~8s left</span>
+                </div>
+              </div>
+              <div style="background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.06); border-radius: 12px; padding: 12px 14px; width: 100%;">
+                <div style="font-size: 9px; color: rgba(255,255,255,.22); font-weight: 800; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 5px;">Early finding</div>
+                <div style="font-size: 12px; color: rgba(244,239,230,.5); line-height: 1.55; font-style: italic;">"Your best week had 4 workouts and no evening meetings. Let's unpack that."</div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: rgba(255,255,255,.12); border-radius: 3px;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Checklist = transparency about what's happening<br>✓ Progress bar reduces abandonment<br>✓ Early finding teaser builds anticipation</div>
+          <div style="color: #888; margin-top: 4px;">→ Skip entirely if analysis &lt; 5s<br>→ Teaser copy should be the actual #1 insight</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       06 — REPORT SCREEN (COMBINED)
+  ══════════════════════════════════════════════════ -->
+  <div style="margin-bottom: 96px;">
+    <div style="display: flex; align-items: baseline; gap: 14px; border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px; margin-bottom: 10px;">
+      <span style="font-family: 'Caveat', cursive; font-size: 36px; font-weight: 700; color: #FB923C; line-height: 1; min-width: 44px;">04</span>
+      <span style="font-size: 22px; font-weight: 600; color: #F4EFE6; letter-spacing: -.01em;">Report Screen</span>
+      <span style="font-family: 'Caveat', cursive; font-size: 16px; color: #494744;">↳ Summary + Analysis + AI Insights · sticky tabs mobile · full page desktop</span>
+    </div>
+    <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-bottom: 36px; line-height: 1.7;">
+      Sections always present — <span style="color: #F4EFE6; opacity: .5;">content adapts to available data.</span> Locked entirely until ≥ 1 service connected.
+    </div>
+
+    <!-- Mobile row label -->
+    <div style="font-family: 'Caveat', cursive; font-size: 17px; font-weight: 700; color: #F4EFE6; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+      Mobile <span style="font-size: 13px; font-weight: 400; color: #494744;">↳ sticky tab bar at top · each section scrolls independently</span>
+    </div>
+    <div style="display: flex; gap: 48px; align-items: flex-start; margin-bottom: 72px;">
+
+      <!-- ACCESS GATE -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #2A2A2E; border: 1px solid rgba(255,255,255,.1); border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #666; margin-bottom: 5px;">🔒 No services connected</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Access gate</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">shown if user reaches report with 0 services · send to onboarding</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 28px 24px; gap: 20px;">
+              <!-- Faded logo -->
+              <div style="position: relative; width: 72px; height: 72px; opacity: .2; flex-shrink: 0;">
+                <div style="position: absolute; inset: 0; border-radius: 50%; border: 1.5px dashed rgba(0,0,0,.3);"></div>
+                <div style="position: absolute; top: 50%; left: 50%; width: 10px; height: 10px; background: #AAA; border-radius: 50%; margin: -5px 0 0 29px;"></div>
+                <div style="position: absolute; inset: 17px; background: #D4CCBC; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                  <span style="font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 800; color: #999;">M</span>
+                </div>
+              </div>
+              <div style="text-align: center;">
+                <div style="font-size: 20px; font-weight: 800; color: #1C1C1E; letter-spacing: -.02em; line-height: 1.2; margin-bottom: 8px;">Your report<br>is waiting.</div>
+                <div style="font-size: 13px; color: #888; line-height: 1.55;">Connect Google Calendar or WHOOP to unlock your personal insights.</div>
+              </div>
+              <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+                <div style="background: rgba(0,0,0,.04); border-radius: 12px; padding: 11px 14px; display: flex; align-items: center; gap: 10px; opacity: .5;">
+                  <div style="width: 30px; height: 30px; background: #EEE9DF; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">📅</div>
+                  <div style="font-size: 12px; font-weight: 600; color: #1C1C1E;">Google Calendar</div>
+                </div>
+                <div style="background: rgba(0,0,0,.04); border-radius: 12px; padding: 11px 14px; display: flex; align-items: center; gap: 10px; opacity: .5;">
+                  <div style="width: 30px; height: 30px; background: #EEE9DF; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;">💪</div>
+                  <div style="font-size: 12px; font-weight: 600; color: #1C1C1E;">WHOOP</div>
+                </div>
+              </div>
+              <div style="background: #FF6535; border-radius: 13px; padding: 14px; width: 100%; text-align: center;">
+                <div style="font-size: 14px; font-weight: 800; color: #fff;">Connect a service →</div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Clear why it's locked<br>✓ CTA goes to onboarding (Screen 02)<br>✓ Faded logo reinforces "waiting" state</div>
+          <div style="color: #888; margin-top: 4px;">→ Edge case: user disconnects all services post-setup<br>→ Or: block at nav level so Report tab is never reachable</div>
+        </div>
+      </div>
+
+      <!-- TAB 1: Summary -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #E8F5E9; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #2E7D32; margin-bottom: 5px;">● Summary tab active</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Your month decoded</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">headline · time allocation · best + worst week</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; overflow: hidden;">
+              <div style="background: #F5F0E8; border-bottom: 1px solid rgba(0,0,0,.07); display: flex; padding: 0 4px;">
+                <div style="flex: 1; padding: 10px 4px 8px; text-align: center; border-bottom: 2px solid #FF6535;"><span style="font-size: 12px; font-weight: 700; color: #FF6535;">Summary</span></div>
+                <div style="flex: 1; padding: 10px 4px 8px; text-align: center; border-bottom: 2px solid transparent;"><span style="font-size: 12px; font-weight: 500; color: #BDBDBD;">Analysis</span></div>
+                <div style="flex: 1; padding: 10px 4px 8px; text-align: center; border-bottom: 2px solid transparent;"><span style="font-size: 12px; font-weight: 500; color: #BDBDBD;">Insights</span></div>
+              </div>
+              <div style="padding: 14px 18px;">
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px;">
+                  <div>
+                    <div style="font-size: 10px; color: #AAA; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 2px;">June 2026</div>
+                    <div style="font-size: 21px; font-weight: 800; color: #1C1C1E; letter-spacing: -.02em; line-height: 1.1;">Your month<br>decoded.</div>
+                  </div>
+                  <div style="display: flex; gap: 4px; margin-top: 4px;">
+                    <span style="background: #E8F0FE; border-radius: 20px; padding: 3px 7px; font-size: 9px; font-weight: 800; color: #1A56DB;">📅 ✓</span>
+                    <span style="background: #F3E8FF; border-radius: 20px; padding: 3px 7px; font-size: 9px; font-weight: 800; color: #7C3AED;">💪 ✓</span>
+                  </div>
+                </div>
+                <div style="background: #fff; border-radius: 12px; padding: 11px 13px; margin-bottom: 9px; box-shadow: 0 1px 4px rgba(0,0,0,.05);">
+                  <div style="font-size: 9px; font-weight: 700; color: #AAA; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px;">Time allocation</div>
+                  <div style="display: flex; height: 8px; border-radius: 4px; overflow: hidden; gap: 1px; margin-bottom: 7px;">
+                    <div style="flex: 45; background: #FF6535;"></div><div style="flex: 20; background: #4ECDC4;"></div><div style="flex: 15; background: #FFD166;"></div><div style="flex: 20; background: #D4CCBC;"></div>
+                  </div>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap; font-size: 9px;">
+                    <span style="color: #FF6535; font-weight: 700;">45% Work</span><span style="color: #4ECDC4; font-weight: 700;">20% Exercise</span><span style="color: #B8920A; font-weight: 700;">15% Family</span><span style="color: #AAA;">20% Other</span>
+                  </div>
+                </div>
+                <div style="background: #EBF7EC; border-radius: 12px; padding: 11px 13px; margin-bottom: 8px; border-left: 3px solid #6BCB77;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="font-size: 10px; font-weight: 800; color: #2E7D32; letter-spacing: .06em; text-transform: uppercase;">🏆 Best · Jun 2–8</span>
+                    <span style="font-size: 16px; font-weight: 900; color: #2E7D32;">84%</span>
+                  </div>
+                  <div style="font-size: 11px; color: #555; line-height: 1.4;">4 workouts · consistent schedule · clear evenings</div>
+                </div>
+                <div style="background: #FFF4EC; border-radius: 12px; padding: 11px 13px; margin-bottom: 10px; border-left: 3px solid #FF9800;">
+                  <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                    <span style="font-size: 10px; font-weight: 800; color: #E65100; letter-spacing: .06em; text-transform: uppercase;">⚡ Rough · Jun 15–19</span>
+                    <span style="font-size: 16px; font-weight: 900; color: #E65100;">52%</span>
+                  </div>
+                  <div style="font-size: 11px; color: #555; line-height: 1.4;">7–9 meetings/day · 0 workouts</div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 13px; background: rgba(0,0,0,.04); border-radius: 10px;">
+                  <span style="font-size: 11px; color: #888;">What drove this?</span>
+                  <span style="font-size: 11px; font-weight: 700; color: #FF6535;">Analysis →</span>
+                </div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Orange underline = active tab — clear at a glance<br>✓ Service badges confirm what data is powering the view<br>✓ Best/worst story visible above the fold</div>
+          <div style="color: #888; margin-top: 4px;">→ Recovery % only shows if WHOOP connected<br>→ "Analysis →" nudges cross-tab flow</div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Analysis -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #FFF8E1; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #F57F17; margin-bottom: 5px;">● Analysis tab active</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">What drove this?</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">87 events · 30 recovery cycles · 6-stat grid</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; overflow: hidden;">
+              <div style="background: #F5F0E8; border-bottom: 1px solid rgba(0,0,0,.07); display: flex; padding: 0 4px;">
+                <div style="flex: 1; padding: 10px 4px 8px; text-align: center; border-bottom: 2px solid transparent;"><span style="font-size: 12px; font-weight: 500; color: #BDBDBD;">Summary</span></div>
+                <div style="flex: 1; padding: 10px 4px 8px; text-align: center; border-bottom: 2px solid #FF6535;"><span style="font-size: 12px; font-weight: 700; color: #FF6535;">Analysis</span></div>
+                <div style="flex: 1; padding: 10px 4px 8px; text-align: center; border-bottom: 2px solid transparent;"><span style="font-size: 12px; font-weight: 500; color: #BDBDBD;">Insights</span></div>
+              </div>
+              <div style="padding: 14px 18px;">
+                <div style="font-size: 10px; font-weight: 700; color: #AAA; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 14px;">June 2026 · Analysis</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                  <div style="background: #fff; border-radius: 12px; padding: 12px 13px; box-shadow: 0 1px 4px rgba(0,0,0,.05);">
+                    <div style="font-size: 30px; font-weight: 800; color: #1C1C1E; letter-spacing: -.03em; line-height: 1; margin-bottom: 4px;">87</div>
+                    <div style="font-size: 10px; color: #888; font-weight: 600;">Events</div>
+                  </div>
+                  <div style="background: #fff; border-radius: 12px; padding: 12px 13px; box-shadow: 0 1px 4px rgba(0,0,0,.05);">
+                    <div style="font-size: 30px; font-weight: 800; color: #1C1C1E; letter-spacing: -.03em; line-height: 1; margin-bottom: 4px;">30</div>
+                    <div style="font-size: 10px; color: #888; font-weight: 600;">Recovery Cycles</div>
+                  </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                  <div style="background: #fff; border-radius: 12px; padding: 12px 13px; box-shadow: 0 1px 4px rgba(0,0,0,.05);">
+                    <div style="font-size: 30px; font-weight: 800; color: #6BCB77; letter-spacing: -.03em; line-height: 1; margin-bottom: 4px;">68%</div>
+                    <div style="font-size: 10px; color: #888; font-weight: 600;">Avg Recovery</div>
+                  </div>
+                  <div style="background: #fff; border-radius: 12px; padding: 12px 13px; box-shadow: 0 1px 4px rgba(0,0,0,.05);">
+                    <div style="font-size: 30px; font-weight: 800; color: #FF6535; letter-spacing: -.03em; line-height: 1; margin-bottom: 4px;">12.4</div>
+                    <div style="font-size: 10px; color: #888; font-weight: 600;">Avg Strain</div>
+                  </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                  <div style="background: #EBF7EC; border-radius: 12px; padding: 12px 13px;">
+                    <div style="font-size: 30px; font-weight: 800; color: #2E7D32; letter-spacing: -.03em; line-height: 1; margin-bottom: 4px;">8</div>
+                    <div style="font-size: 10px; color: #2E7D32; font-weight: 700; line-height: 1.3;">High Recovery<br>Days</div>
+                  </div>
+                  <div style="background: #FFF4EC; border-radius: 12px; padding: 12px 13px;">
+                    <div style="font-size: 30px; font-weight: 800; color: #E65100; letter-spacing: -.03em; line-height: 1; margin-bottom: 4px;">6</div>
+                    <div style="font-size: 10px; color: #E65100; font-weight: 700; line-height: 1.3;">Low Recovery<br>Days</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #1C1C1E; border-radius: 3px; opacity: .18;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Stats are deterministic — computed, not inferred<br>✓ Calendar+WHOOP: 6-stat grid · see all 3 states below<br>✓ No charts, no AI — just numbers</div>
+          <div style="color: #888; margin-top: 4px;">→ High recovery = ≥67% · Low = &lt;33% (thresholds TBD)<br>→ See "Analysis tab" sub-row below for all 3 connection states</div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Insights -->
+      <div style="flex: none; width: 320px;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #F3E8FF; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #7C3AED; margin-bottom: 5px;">● Insights tab active</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">AI hypotheses</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">finding + caveat + confidence · 3 cards per report</div>
+        </div>
+        <div style="width: 320px; background: #1F1E22; border-radius: 44px; padding: 10px; box-shadow: 0 24px 64px rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position: relative; background: #F5F0E8; border-radius: 36px; height: 648px; overflow: hidden;">
+            <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); width: 108px; height: 28px; background: #1F1E22; border-radius: 20px; z-index: 20;"></div>
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 44px; z-index: 10; display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 24px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #1C1C1E;">9:41</span>
+              <span style="font-size: 10px; color: #1C1C1E; opacity: .5; padding-top: 2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position: absolute; top: 44px; left: 0; right: 0; bottom: 28px; overflow: hidden;">
+              <div style="background: #F5F0E8; border-bottom: 1px solid rgba(0,0,0,.07); display: flex; padding: 0 4px;">
+                <div style="flex: 1; padding: 10px 4px 8px; text-align: center; border-bottom: 2px solid transparent;"><span style="font-size: 12px; font-weight: 500; color: #BDBDBD;">Summary</span></div>
+                <div style="flex: 1; padding: 10px 4px 8px; text-align: center; border-bottom: 2px solid transparent;"><span style="font-size: 12px; font-weight: 500; color: #BDBDBD;">Analysis</span></div>
+                <div style="flex: 1; padding: 10px 4px 8px; text-align: center; border-bottom: 2px solid #FF6535;"><span style="font-size: 12px; font-weight: 700; color: #FF6535;">Insights</span></div>
+              </div>
+              <div style="padding: 14px 18px;">
+                <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px;">
+                  <div style="font-size: 18px; font-weight: 800; color: #1C1C1E; letter-spacing: -.015em;">3 findings.</div>
+                  <div style="font-size: 10px; color: #AAA;">26 days of data</div>
+                </div>
+                <div style="background: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 5px rgba(0,0,0,.07);">
+                  <div style="display: inline-block; background: #E8F0FE; border-radius: 5px; padding: 2px 7px; font-size: 9px; font-weight: 800; color: #1A56DB; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px;">Finding</div>
+                  <div style="font-size: 12px; font-weight: 700; color: #1C1C1E; line-height: 1.4; margin-bottom: 7px;">Exercise appears in 80% of your highest-recovery days.</div>
+                  <div style="background: #F5F0E8; border-radius: 7px; padding: 7px 9px; margin-bottom: 7px;">
+                    <div style="font-size: 9px; font-weight: 800; color: #AAA; margin-bottom: 2px;">⚠ ALTERNATIVE</div>
+                    <div style="font-size: 10px; color: #888; line-height: 1.45;">High recovery may enable exercise — direction unclear.</div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 10px; color: #888;">Confidence</span>
+                    <div style="display: flex; gap: 3px; align-items: center;">
+                      <div style="width: 9px; height: 9px; background: #FFD166; border-radius: 3px;"></div><div style="width: 9px; height: 9px; background: #FFD166; border-radius: 3px;"></div><div style="width: 9px; height: 9px; background: #E0D9CE; border-radius: 3px;"></div>
+                      <span style="font-size: 9px; color: #AAA; margin-left: 3px;">Moderate</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="background: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 8px; box-shadow: 0 1px 5px rgba(0,0,0,.07);">
+                  <div style="display: inline-block; background: #FFF3E0; border-radius: 5px; padding: 2px 7px; font-size: 9px; font-weight: 800; color: #E65100; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px;">Surprise</div>
+                  <div style="font-size: 12px; font-weight: 700; color: #1C1C1E; line-height: 1.4; margin-bottom: 7px;">Fragmentation predicts recovery better than total hours worked.</div>
+                  <div style="background: #F5F0E8; border-radius: 7px; padding: 7px 9px; margin-bottom: 7px;">
+                    <div style="font-size: 9px; font-weight: 800; color: #AAA; margin-bottom: 2px;">⚠ ALTERNATIVE</div>
+                    <div style="font-size: 10px; color: #888; line-height: 1.45;">Both may reflect underlying stress response.</div>
+                  </div>
+                  <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 10px; color: #888;">Confidence</span>
+                    <div style="display: flex; gap: 3px; align-items: center;">
+                      <div style="width: 9px; height: 9px; background: #6BCB77; border-radius: 3px;"></div><div style="width: 9px; height: 9px; background: #6BCB77; border-radius: 3px;"></div><div style="width: 9px; height: 9px; background: #6BCB77; border-radius: 3px;"></div>
+                      <span style="font-size: 9px; color: #AAA; margin-left: 3px;">Consistent · n=26</span>
+                    </div>
+                  </div>
+                </div>
+                <div style="background: #1C1C1E; border-radius: 14px; padding: 12px 14px;">
+                  <div style="display: inline-block; background: rgba(255,101,53,.2); border-radius: 5px; padding: 2px 7px; font-size: 9px; font-weight: 800; color: #FF6535; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 7px;">Try this</div>
+                  <div style="font-size: 12px; font-weight: 700; color: #F4EFE6; line-height: 1.4; margin-bottom: 9px;">Block one free evening. Track recovery for 3 nights.</div>
+                  <div style="background: #FF6535; border-radius: 9px; padding: 8px; text-align: center; font-size: 11px; font-weight: 800; color: #fff;">+ Add to calendar</div>
+                </div>
+              </div>
+            </div>
+            <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 118px; height: 4px; background: #F5F0E8; border-radius: 3px; opacity: .3;"></div>
+          </div>
+        </div>
+        <div style="margin-top: 16px; font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.75;">
+          <div style="color: #6BCB77;">✓ Finding / Surprise / Try this — clear taxonomy<br>✓ Caveat always visible — never behind a tap<br>✓ "Try this" bridges insight → action in-tab</div>
+          <div style="color: #888; margin-top: 4px;">→ 3 cards = target per report, not a scrolling feed<br>→ "Add to calendar" deep-links to Calendar app</div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <!-- Analysis variants by connection state -->
+    <div style="font-family:'Caveat',cursive;font-size:17px;font-weight:700;color:#F4EFE6;margin-bottom:24px;display:flex;align-items:center;gap:12px;">
+      Analysis tab <span style="font-size:13px;font-weight:400;color:#494744;">↳ content adapts to which services are connected · same tab, different data</span>
+    </div>
+    <div style="display:flex;gap:48px;align-items:flex-start;margin-bottom:72px;">
+      
+      <div style="flex:none;width:320px;">
+        <div style="margin-bottom:16px;">
+          <div style="display:inline-flex;background:#E8F0FE;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:800;color:#1A56DB;margin-bottom:5px;">📅 Calendar only</div>
+          <div style="font-family:'Caveat',cursive;font-size:19px;font-weight:700;color:#F4EFE6;">Calendar only</div>
+          <div style="font-family:'Caveat',cursive;font-size:14px;color:#555;margin-top:2px;">87 events · 42h scheduled · top categories · busiest day</div>
+        </div>
+        <div style="width:320px;background:#1F1E22;border-radius:44px;padding:10px;box-shadow:0 24px 64px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position:relative;background:#F5F0E8;border-radius:36px;height:648px;overflow:hidden;">
+            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);width:108px;height:28px;background:#1F1E22;border-radius:20px;z-index:20;"></div>
+            <div style="position:absolute;top:0;left:0;right:0;height:44px;z-index:10;display:flex;align-items:flex-start;justify-content:space-between;padding:14px 24px 0;">
+              <span style="font-size:11px;font-weight:700;color:#1C1C1E;">9:41</span>
+              <span style="font-size:10px;color:#1C1C1E;opacity:.5;padding-top:2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position:absolute;top:44px;left:0;right:0;bottom:28px;overflow:hidden;">
+              <div style="background:#F5F0E8;border-bottom:1px solid rgba(0,0,0,.07);display:flex;padding:0 4px;">
+                <div style="flex:1;padding:10px 4px 8px;text-align:center;border-bottom:2px solid transparent;"><span style="font-size:12px;font-weight:500;color:#BDBDBD;">Summary</span></div>
+                <div style="flex:1;padding:10px 4px 8px;text-align:center;border-bottom:2px solid #FF6535;"><span style="font-size:12px;font-weight:700;color:#FF6535;">Analysis</span></div>
+                <div style="flex:1;padding:10px 4px 8px;text-align:center;border-bottom:2px solid transparent;"><span style="font-size:12px;font-weight:500;color:#BDBDBD;">Insights</span></div>
+              </div>
+              <div style="padding:14px 18px;overflow:hidden;">
+                <div style="font-size:10px;font-weight:700;color:#AAA;letter-spacing:.09em;text-transform:uppercase;margin-bottom:14px;">June 2026 · Analysis</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;"><div style="background:#fff;border-radius:12px;padding:12px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-size:30px;font-weight:800;color:#1C1C1E;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">87</div><div style="font-size:10px;color:#888;font-weight:600;line-height:1.3;">Events</div></div><div style="background:#fff;border-radius:12px;padding:12px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-size:30px;font-weight:800;color:#1C1C1E;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">42h</div><div style="font-size:10px;color:#888;font-weight:600;line-height:1.3;">Scheduled Hours</div></div></div><div style="background:#fff;border-radius:12px;padding:12px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:8px;"><div style="font-size:9px;font-weight:800;color:#AAA;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">Top Categories</div><div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;"><span style="font-size:11px;font-weight:600;color:#1C1C1E;">Work</span><span style="font-size:11px;font-weight:700;color:#FF6535;">48%</span></div><div style="height:4px;background:#E0D9CE;border-radius:2px;overflow:hidden;"><div style="width:48%;height:100%;background:#FF6535;border-radius:2px;"></div></div></div><div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;"><span style="font-size:11px;font-weight:600;color:#1C1C1E;">Exercise</span><span style="font-size:11px;font-weight:700;color:#4ECDC4;">22%</span></div><div style="height:4px;background:#E0D9CE;border-radius:2px;overflow:hidden;"><div style="width:22%;height:100%;background:#4ECDC4;border-radius:2px;"></div></div></div><div style="margin-bottom:7px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;"><span style="font-size:11px;font-weight:600;color:#1C1C1E;">Social</span><span style="font-size:11px;font-weight:700;color:#FFD166;">12%</span></div><div style="height:4px;background:#E0D9CE;border-radius:2px;overflow:hidden;"><div style="width:12%;height:100%;background:#FFD166;border-radius:2px;"></div></div></div></div><div style="background:#fff;border-radius:12px;padding:12px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-size:9px;font-weight:800;color:#AAA;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px;">Busiest Day</div><div style="font-size:24px;font-weight:800;color:#1C1C1E;letter-spacing:-.02em;">Tuesday</div></div>
+              </div>
+            </div>
+            <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:118px;height:4px;background:#1C1C1E;border-radius:3px;opacity:.18;"></div>
+          </div>
+        </div>
+        <div style="margin-top:16px;font-family:'Caveat',cursive;font-size:13px;line-height:1.75;">
+          <div style="color:#6BCB77;">✓ Pure calendar analytics — no WHOOP needed<br>✓ Category breakdown answers "where did my time go?"<br>✓ Busiest day helps spot structural patterns</div>
+          <div style="color:#888;margin-top:4px;">→ Categories derived from event titles / calendar labels<br>→ "Scheduled Hours" = sum of all non-declined events</div>
+        </div>
+      </div>
+      
+      <div style="flex:none;width:320px;">
+        <div style="margin-bottom:16px;">
+          <div style="display:inline-flex;background:#F3E8FF;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:800;color:#7C3AED;margin-bottom:5px;">💪 WHOOP only</div>
+          <div style="font-family:'Caveat',cursive;font-size:19px;font-weight:700;color:#F4EFE6;">WHOOP only</div>
+          <div style="font-family:'Caveat',cursive;font-size:14px;color:#555;margin-top:2px;">avg recovery · avg strain · best + worst recovery</div>
+        </div>
+        <div style="width:320px;background:#1F1E22;border-radius:44px;padding:10px;box-shadow:0 24px 64px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position:relative;background:#F5F0E8;border-radius:36px;height:648px;overflow:hidden;">
+            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);width:108px;height:28px;background:#1F1E22;border-radius:20px;z-index:20;"></div>
+            <div style="position:absolute;top:0;left:0;right:0;height:44px;z-index:10;display:flex;align-items:flex-start;justify-content:space-between;padding:14px 24px 0;">
+              <span style="font-size:11px;font-weight:700;color:#1C1C1E;">9:41</span>
+              <span style="font-size:10px;color:#1C1C1E;opacity:.5;padding-top:2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position:absolute;top:44px;left:0;right:0;bottom:28px;overflow:hidden;">
+              <div style="background:#F5F0E8;border-bottom:1px solid rgba(0,0,0,.07);display:flex;padding:0 4px;">
+                <div style="flex:1;padding:10px 4px 8px;text-align:center;border-bottom:2px solid transparent;"><span style="font-size:12px;font-weight:500;color:#BDBDBD;">Summary</span></div>
+                <div style="flex:1;padding:10px 4px 8px;text-align:center;border-bottom:2px solid #FF6535;"><span style="font-size:12px;font-weight:700;color:#FF6535;">Analysis</span></div>
+                <div style="flex:1;padding:10px 4px 8px;text-align:center;border-bottom:2px solid transparent;"><span style="font-size:12px;font-weight:500;color:#BDBDBD;">Insights</span></div>
+              </div>
+              <div style="padding:14px 18px;overflow:hidden;">
+                <div style="font-size:10px;font-weight:700;color:#AAA;letter-spacing:.09em;text-transform:uppercase;margin-bottom:14px;">June 2026 · Analysis</div><div style="background:#fff;border-radius:12px;padding:16px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:8px;text-align:center;"><div style="font-size:48px;font-weight:800;color:#6BCB77;letter-spacing:-.04em;line-height:1;margin-bottom:4px;">68%</div><div style="font-size:11px;color:#888;font-weight:600;">Average Recovery</div></div><div style="background:#fff;border-radius:12px;padding:16px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:8px;text-align:center;"><div style="font-size:48px;font-weight:800;color:#FF6535;letter-spacing:-.04em;line-height:1;margin-bottom:4px;">12.4</div><div style="font-size:11px;color:#888;font-weight:600;">Average Strain</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div style="background:#EBF7EC;border-radius:12px;padding:12px 13px;box-shadow:none;"><div style="font-size:30px;font-weight:800;color:#2E7D32;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">81%</div><div style="font-size:10px;color:#2E7D32;font-weight:700;line-height:1.3;">Best Recovery</div></div><div style="background:#FFF4EC;border-radius:12px;padding:12px 13px;box-shadow:none;"><div style="font-size:30px;font-weight:800;color:#E65100;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">28%</div><div style="font-size:10px;color:#E65100;font-weight:700;line-height:1.3;">Worst Recovery</div></div></div>
+              </div>
+            </div>
+            <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:118px;height:4px;background:#1C1C1E;border-radius:3px;opacity:.18;"></div>
+          </div>
+        </div>
+        <div style="margin-top:16px;font-family:'Caveat',cursive;font-size:13px;line-height:1.75;">
+          <div style="color:#6BCB77;">✓ Recovery stats are immediately meaningful alone<br>✓ Best/worst gives the range — not just the average<br>✓ Strain pairs with recovery to tell the effort story</div>
+          <div style="color:#888;margin-top:4px;">→ All figures are 30-day averages<br>→ High/Low Recovery Days not shown — requires Calendar to define "day type"</div>
+        </div>
+      </div>
+      
+      <div style="flex:none;width:320px;">
+        <div style="margin-bottom:16px;">
+          <div style="display:inline-flex;background:#E8F5E9;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:800;color:#2E7D32;margin-bottom:5px;">✓ Both connected</div>
+          <div style="font-family:'Caveat',cursive;font-size:19px;font-weight:700;color:#F4EFE6;">Calendar + WHOOP</div>
+          <div style="font-family:'Caveat',cursive;font-size:14px;color:#555;margin-top:2px;">87 events · 30 recovery cycles · 6-stat grid</div>
+        </div>
+        <div style="width:320px;background:#1F1E22;border-radius:44px;padding:10px;box-shadow:0 24px 64px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,255,255,.06);">
+          <div style="position:relative;background:#F5F0E8;border-radius:36px;height:648px;overflow:hidden;">
+            <div style="position:absolute;top:10px;left:50%;transform:translateX(-50%);width:108px;height:28px;background:#1F1E22;border-radius:20px;z-index:20;"></div>
+            <div style="position:absolute;top:0;left:0;right:0;height:44px;z-index:10;display:flex;align-items:flex-start;justify-content:space-between;padding:14px 24px 0;">
+              <span style="font-size:11px;font-weight:700;color:#1C1C1E;">9:41</span>
+              <span style="font-size:10px;color:#1C1C1E;opacity:.5;padding-top:2px;">▲ ▲ ▲</span>
+            </div>
+            <div style="position:absolute;top:44px;left:0;right:0;bottom:28px;overflow:hidden;">
+              <div style="background:#F5F0E8;border-bottom:1px solid rgba(0,0,0,.07);display:flex;padding:0 4px;">
+                <div style="flex:1;padding:10px 4px 8px;text-align:center;border-bottom:2px solid transparent;"><span style="font-size:12px;font-weight:500;color:#BDBDBD;">Summary</span></div>
+                <div style="flex:1;padding:10px 4px 8px;text-align:center;border-bottom:2px solid #FF6535;"><span style="font-size:12px;font-weight:700;color:#FF6535;">Analysis</span></div>
+                <div style="flex:1;padding:10px 4px 8px;text-align:center;border-bottom:2px solid transparent;"><span style="font-size:12px;font-weight:500;color:#BDBDBD;">Insights</span></div>
+              </div>
+              <div style="padding:14px 18px;overflow:hidden;">
+                <div style="font-size:10px;font-weight:700;color:#AAA;letter-spacing:.09em;text-transform:uppercase;margin-bottom:14px;">June 2026 · Analysis</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;"><div style="background:#fff;border-radius:12px;padding:12px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-size:30px;font-weight:800;color:#1C1C1E;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">87</div><div style="font-size:10px;color:#888;font-weight:600;line-height:1.3;">Events</div></div><div style="background:#fff;border-radius:12px;padding:12px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-size:30px;font-weight:800;color:#1C1C1E;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">30</div><div style="font-size:10px;color:#888;font-weight:600;line-height:1.3;">Recovery Cycles</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;"><div style="background:#fff;border-radius:12px;padding:12px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-size:30px;font-weight:800;color:#6BCB77;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">68%</div><div style="font-size:10px;color:#888;font-weight:600;line-height:1.3;">Avg Recovery</div></div><div style="background:#fff;border-radius:12px;padding:12px 13px;box-shadow:0 1px 4px rgba(0,0,0,.05);"><div style="font-size:30px;font-weight:800;color:#FF6535;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">12.4</div><div style="font-size:10px;color:#888;font-weight:600;line-height:1.3;">Avg Strain</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div style="background:#EBF7EC;border-radius:12px;padding:12px 13px;box-shadow:none;"><div style="font-size:30px;font-weight:800;color:#2E7D32;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">8</div><div style="font-size:10px;color:#2E7D32;font-weight:700;line-height:1.3;">High Recovery<br>Days</div></div><div style="background:#FFF4EC;border-radius:12px;padding:12px 13px;box-shadow:none;"><div style="font-size:30px;font-weight:800;color:#E65100;letter-spacing:-.03em;line-height:1;margin-bottom:4px;">6</div><div style="font-size:10px;color:#E65100;font-weight:700;line-height:1.3;">Low Recovery<br>Days</div></div></div>
+              </div>
+            </div>
+            <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:118px;height:4px;background:#1C1C1E;border-radius:3px;opacity:.18;"></div>
+          </div>
+        </div>
+        <div style="margin-top:16px;font-family:'Caveat',cursive;font-size:13px;line-height:1.75;">
+          <div style="color:#6BCB77;">✓ 6 stats tell the complete picture<br>✓ High/Low Recovery Days only possible with both services<br>✓ Grid layout — no charts — purely computed data</div>
+          <div style="color:#888;margin-top:4px;">→ High recovery = recovery ≥ 67% (green zone)<br>→ Low recovery = recovery &lt; 33% (red zone)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop row -->
+    <div style="font-family: 'Caveat', cursive; font-size: 17px; font-weight: 700; color: #F4EFE6; margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+      Desktop <span style="font-size: 13px; font-weight: 400; color: #494744;">↳ no tabs · all 3 sections visible · grid layout</span>
+    </div>
+    <div style="display: flex; gap: 48px; align-items: flex-start;">
+      <div style="flex: none;">
+        <div style="margin-bottom: 16px;">
+          <div style="display: inline-flex; background: #E8F5E9; border-radius: 20px; padding: 3px 10px; font-size: 10px; font-weight: 800; color: #2E7D32; margin-bottom: 5px;">✓ Both connected</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 19px; font-weight: 700; color: #F4EFE6;">Desktop viewport — above the fold</div>
+          <div style="font-family: 'Caveat', cursive; font-size: 14px; color: #555; margin-top: 2px;">Summary · Analysis · Insights stacked single column</div>
+        </div>
+        <div style="width: 780px; background: #F5F0E8; border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,255,255,.1);">
+          <!-- Top bar -->
+          <div style="background: #fff; border-bottom: 1px solid rgba(0,0,0,.08); padding: 0 24px; height: 50px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="display: flex; gap: 6px;">
+                <div style="width: 11px; height: 11px; background: #FF6535; border-radius: 50%;"></div>
+                <div style="width: 11px; height: 11px; background: #FFD166; border-radius: 50%;"></div>
+                <div style="width: 11px; height: 11px; background: #6BCB77; border-radius: 50%;"></div>
+              </div>
+              <div style="width: 1px; height: 20px; background: rgba(0,0,0,.08);"></div>
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: #1C1C1E; letter-spacing: -.01em;">June 2026 · Personal Report</div>
+                <div style="font-size: 10px; color: #AAA; margin-top: 1px;">Last analyzed today at 9:41</div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="background: #E8F0FE; color: #1A56DB; font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 20px;">📅 Calendar ✓</span>
+              <span style="background: #F3E8FF; color: #7C3AED; font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 20px;">💪 WHOOP ✓</span>
+              <div style="font-size: 11px; color: #FF6535; font-weight: 700; border: 1.5px solid rgba(255,101,53,.3); border-radius: 7px; padding: 5px 11px;">↻ Re-analyze</div>
+            </div>
+          </div>
+          <!-- Content -->
+          <div style="display: grid; grid-template-rows: auto 1fr;">
+            <!-- Summary row -->
+            <div style="background: #fff; border-bottom: 1px solid rgba(0,0,0,.07); padding: 18px 28px;">
+              <div style="display: flex; align-items: flex-start; gap: 28px;">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="font-size: 10px; font-weight: 700; color: #AAA; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 4px;">Summary · June 2026</div>
+                  <div style="font-size: 22px; font-weight: 800; color: #1C1C1E; letter-spacing: -.02em; line-height: 1.1; margin-bottom: 12px;">Your month decoded.</div>
+                  <div style="display: flex; height: 7px; border-radius: 4px; overflow: hidden; gap: 1px; margin-bottom: 6px;">
+                    <div style="flex: 45; background: #FF6535;"></div><div style="flex: 20; background: #4ECDC4;"></div><div style="flex: 15; background: #FFD166;"></div><div style="flex: 20; background: #D4CCBC;"></div>
+                  </div>
+                  <div style="display: flex; gap: 12px; font-size: 10px;">
+                    <span style="color: #FF6535; font-weight: 700;">45% Work</span><span style="color: #4ECDC4; font-weight: 700;">20% Exercise</span><span style="color: #B8920A; font-weight: 700;">15% Family</span><span style="color: #AAA;">20% Other</span>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 10px; flex-shrink: 0;">
+                  <div style="background: #EBF7EC; border-radius: 10px; padding: 10px 14px; border-left: 3px solid #6BCB77; width: 175px;">
+                    <div style="font-size: 9px; font-weight: 800; color: #2E7D32; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 3px;">🏆 Best · Jun 2–8</div>
+                    <div style="font-size: 20px; font-weight: 900; color: #2E7D32; line-height: 1; margin-bottom: 3px;">84%</div>
+                    <div style="font-size: 10px; color: #555; line-height: 1.4;">4 workouts · clear evenings</div>
+                  </div>
+                  <div style="background: #FFF4EC; border-radius: 10px; padding: 10px 14px; border-left: 3px solid #FF9800; width: 175px;">
+                    <div style="font-size: 9px; font-weight: 800; color: #E65100; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 3px;">⚡ Rough · Jun 15–19</div>
+                    <div style="font-size: 20px; font-weight: 900; color: #E65100; line-height: 1; margin-bottom: 3px;">52%</div>
+                    <div style="font-size: 10px; color: #555; line-height: 1.4;">7–9 meetings · 0 workouts</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Two columns -->
+            <div style="display: flex; flex-direction: column; overflow: hidden;">
+              <div style="padding: 18px 28px; overflow: hidden; border-bottom: 1px solid rgba(0,0,0,.07);">
+                <div style="font-size: 10px; font-weight: 800; color: #AAA; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 14px;">Analysis · June 2026</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                  <div style="background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06);">
+                    <div style="font-size: 26px; font-weight: 800; color: #1C1C1E; letter-spacing: -.03em; line-height: 1; margin-bottom: 3px;">87</div>
+                    <div style="font-size: 10px; color: #888; font-weight: 600;">Events</div>
+                  </div>
+                  <div style="background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06);">
+                    <div style="font-size: 26px; font-weight: 800; color: #1C1C1E; letter-spacing: -.03em; line-height: 1; margin-bottom: 3px;">30</div>
+                    <div style="font-size: 10px; color: #888; font-weight: 600;">Recovery Cycles</div>
+                  </div>
+                  <div style="background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06);">
+                    <div style="font-size: 26px; font-weight: 800; color: #6BCB77; letter-spacing: -.03em; line-height: 1; margin-bottom: 3px;">68%</div>
+                    <div style="font-size: 10px; color: #888; font-weight: 600;">Avg Recovery</div>
+                  </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                  <div style="background: #fff; border-radius: 10px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.06);">
+                    <div style="font-size: 26px; font-weight: 800; color: #FF6535; letter-spacing: -.03em; line-height: 1; margin-bottom: 3px;">12.4</div>
+                    <div style="font-size: 10px; color: #888; font-weight: 600;">Avg Strain</div>
+                  </div>
+                  <div style="background: #EBF7EC; border-radius: 10px; padding: 12px 14px;">
+                    <div style="font-size: 26px; font-weight: 800; color: #2E7D32; letter-spacing: -.03em; line-height: 1; margin-bottom: 3px;">8</div>
+                    <div style="font-size: 10px; color: #2E7D32; font-weight: 700;">High Recov. Days</div>
+                  </div>
+                  <div style="background: #FFF4EC; border-radius: 10px; padding: 12px 14px;">
+                    <div style="font-size: 26px; font-weight: 800; color: #E65100; letter-spacing: -.03em; line-height: 1; margin-bottom: 3px;">6</div>
+                    <div style="font-size: 10px; color: #E65100; font-weight: 700;">Low Recov. Days</div>
+                  </div>
+                </div></div>
+              <div style="padding: 18px 28px; overflow: hidden;">
+                <div style="font-size: 10px; font-weight: 800; color: #AAA; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 12px;">AI Insights · 3 findings</div>
+                <div style="background: #fff; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.06);">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px;">
+                    <div>
+                      <div style="display: inline-block; background: #E8F0FE; border-radius: 4px; padding: 1px 6px; font-size: 8px; font-weight: 800; color: #1A56DB; text-transform: uppercase; margin-bottom: 4px;">Finding</div>
+                      <div style="font-size: 11px; font-weight: 700; color: #1C1C1E; line-height: 1.4;">Exercise appears in 80% of high-recovery days.</div>
+                    </div>
+                    <div style="display: flex; gap: 2px; flex-shrink: 0;">
+                      <div style="width: 7px; height: 7px; background: #FFD166; border-radius: 2px;"></div><div style="width: 7px; height: 7px; background: #FFD166; border-radius: 2px;"></div><div style="width: 7px; height: 7px; background: #E0D9CE; border-radius: 2px;"></div>
+                    </div>
+                  </div>
+                  <div style="display: inline-block; background: #FFF4EC; border-radius: 4px; padding: 1px 6px; font-size: 8px; color: #E65100; font-weight: 800;">⚠ Reverse causality likely</div>
+                </div>
+                <div style="background: #fff; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.06);">
+                  <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 5px;">
+                    <div>
+                      <div style="display: inline-block; background: #FFF3E0; border-radius: 4px; padding: 1px 6px; font-size: 8px; font-weight: 800; color: #E65100; text-transform: uppercase; margin-bottom: 4px;">Surprise</div>
+                      <div style="font-size: 11px; font-weight: 700; color: #1C1C1E; line-height: 1.4;">Fragmentation predicts recovery better than total hours.</div>
+                    </div>
+                    <div style="display: flex; gap: 2px; flex-shrink: 0;">
+                      <div style="width: 7px; height: 7px; background: #6BCB77; border-radius: 2px;"></div><div style="width: 7px; height: 7px; background: #6BCB77; border-radius: 2px;"></div><div style="width: 7px; height: 7px; background: #6BCB77; border-radius: 2px;"></div>
+                    </div>
+                  </div>
+                  <div style="display: inline-block; background: #FFF4EC; border-radius: 4px; padding: 1px 6px; font-size: 8px; color: #E65100; font-weight: 800;">⚠ Confounding with stress</div>
+                </div>
+                <div style="background: #1C1C1E; border-radius: 10px; padding: 11px 12px;">
+                  <div style="display: inline-block; background: rgba(255,101,53,.2); border-radius: 4px; padding: 1px 6px; font-size: 8px; font-weight: 800; color: #FF6535; text-transform: uppercase; margin-bottom: 6px;">Try this</div>
+                  <div style="font-size: 11px; font-weight: 700; color: #F4EFE6; line-height: 1.4; margin-bottom: 8px;">Block one free evening. Track recovery for 3 nights.</div>
+                  <div style="background: #FF6535; border-radius: 7px; padding: 6px 10px; text-align: center; font-size: 10px; font-weight: 800; color: #fff;">+ Add to calendar</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="flex: none; width: 240px; padding-top: 50px;">
+        <div style="font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.85; color: #6BCB77; margin-bottom: 12px;">
+          ✓ No tabs — all 3 sections always visible<br>
+          ✓ Single column — simpler to build and read<br>
+          ✓ Summary → Analysis → Insights flows top-down<br>
+          ✓ Scroll reveals more — no information hierarchy lost
+        </div>
+        <div style="font-family: 'Caveat', cursive; font-size: 13px; line-height: 1.85; color: #888; margin-bottom: 18px;">
+          → Breakpoint: &lt;768px → sticky tab bar<br>
+          → Medium: columns stack vertically<br>
+          → "Re-analyze" always top-right
+        </div>
+        <div style="border-top: 1px dashed rgba(255,255,255,.1); padding-top: 14px; font-family: 'Caveat', cursive; font-size: 13px; color: #494744; line-height: 1.75;">
+          <div style="color: #F4EFE6; opacity: .5; font-weight: 700; margin-bottom: 5px;">Open question</div>
+          2-col grid (as shown) vs. single centred column (report-doc feel)?
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPEN QUESTIONS FOOTER (updated) -->
+  <div style="border-top: 1px solid rgba(255,255,255,.08); padding-top: 28px; max-width: 840px;">
+    <div style="font-family: 'Caveat', cursive; font-size: 15px; color: #444; line-height: 1.8;">
+      <div style="font-size: 17px; font-weight: 700; color: #6BCB77; margin-bottom: 6px;">Confirmed ✓</div>
+      <div style="color: #6BCB77; margin-bottom: 3px;">01 · Account creation — Google-only sign-in · welcome → Google sheet → account ready</div>
+      <div style="color: #6BCB77; margin-bottom: 3px;">02 · Service gallery — connect in any order, 1 service is enough to start</div>
+      <div style="color: #6BCB77; margin-bottom: 3px;">03 · Narrative-first — content conditional on which services are connected</div>
+      <div style="color: #6BCB77; margin-bottom: 3px;">06 · Loading: animated orbit logo · dark screen · progress + early finding teaser</div>
+      <div style="color: #6BCB77; margin-bottom: 3px;">07 · Report: Summary + Analysis + Insights merged · access gate if 0 services · sticky tabs mobile · single-column desktop</div>
+      <div style="color: #6BCB77; margin-bottom: 3px;">A · Desktop: single column — no 2-col grid — simpler to build</div>
+      <div style="color: #6BCB77; margin-bottom: 3px;">D · Re-analyze: shows loading screen again (not an inline skeleton)</div>
+      <div style="color: #6BCB77; margin-bottom: 3px;">E · Date range: rolling 30 days · not user-configurable · no UI needed</div>
+      <div style="color: #6BCB77; margin-bottom: 16px;">B · Analysis content defined: Calendar-only = events + categories + busiest day · WHOOP-only = recovery + strain · Both = 6-stat grid</div>
+      <div style="font-size: 17px; font-weight: 700; color: #666; margin-bottom: 8px;">Still open</div>
+      <div>B. <span style="color: #F4EFE6; opacity: .7;">Recovery metric is WHOOP-specific.</span> Garmin → Body Battery; Oura → Readiness; Fitbit → none. How does the report degrade gracefully?</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
