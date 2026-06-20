@@ -13,13 +13,15 @@ export function InsightsSection({
   return (
     <section aria-labelledby="insights-heading">
       <div className="mb-6">
-        <h2 id="insights-heading" className="text-2xl font-bold tracking-tight">
-          AI Insights
-        </h2>
-        <p className="text-sm text-muted-foreground mt-1">
-          {findings.length} findings. {coverageDays} days of data.
-          <span className="ml-1 text-xs">({windowLabel})</span>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+          AI Insights · {windowLabel}
         </p>
+        <div className="flex items-baseline justify-between">
+          <h2 id="insights-heading" className="text-2xl font-bold tracking-tight">
+            {findings.length} findings.
+          </h2>
+          <span className="text-sm text-muted-foreground">{coverageDays} days of data</span>
+        </div>
       </div>
 
       <div className="space-y-4">
