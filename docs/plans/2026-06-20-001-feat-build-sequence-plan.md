@@ -1,10 +1,10 @@
 ---
 title: "feat: MySubscriptions MVP build sequence (vertical slices)"
 date: 2026-06-20
-type: feat
+type: sequence
 depth: lightweight
 origin: docs/brainstorms/mvp.md
-status: draft
+status: active
 ---
 
 # feat: MySubscriptions MVP build sequence (vertical slices)
