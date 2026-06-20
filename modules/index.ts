@@ -1,2 +1,2 @@
 /** Application services, business rules, domain logic, and repository interfaces. */
-export {};
+export { getReport } from './report/reportService';
