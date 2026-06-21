@@ -1,7 +1,7 @@
 import type { CalendarCapability, CalendarTokens, OwnedCalendar, RawCalendarEvent } from '@/shared/capabilities/calendar'
+import { OAuthError } from '@/shared/capabilities/calendar'
 import type { Logger } from '@/shared/capabilities/logger'
 import type { CalendarRepository } from './calendarRepository'
-import { OAuthError } from '@/infrastructure/calendar/googleCalendar'
 
 export class IntegrationNotFoundError extends Error {
   constructor() {

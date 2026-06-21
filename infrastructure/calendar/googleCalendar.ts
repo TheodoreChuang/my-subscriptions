@@ -1,18 +1,11 @@
 import type { CalendarCapability, CalendarTokens, OwnedCalendar, RawCalendarEvent } from '@/shared/capabilities/calendar'
+import { OAuthError } from '@/shared/capabilities/calendar'
 import type { Logger } from '@/shared/capabilities/logger'
+
+export { OAuthError }
 
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 const GCAL_API_BASE = 'https://www.googleapis.com/calendar/v3'
-
-export class OAuthError extends Error {
-  constructor(
-    message: string,
-    public readonly code: string,
-  ) {
-    super(message)
-    this.name = 'OAuthError'
-  }
-}
 
 export class GoogleCalendarClient implements CalendarCapability {
   constructor(

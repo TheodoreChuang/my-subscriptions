@@ -19,6 +19,16 @@ export type RawCalendarEvent = {
   recurringEventId?: string
 }
 
+export class OAuthError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+  ) {
+    super(message)
+    this.name = 'OAuthError'
+  }
+}
+
 export interface CalendarCapability {
   exchangeCode(code: string, redirectUri: string): Promise<CalendarTokens>
   listOwnedCalendars(tokens: CalendarTokens): Promise<OwnedCalendar[]>
