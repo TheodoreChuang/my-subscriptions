@@ -108,26 +108,26 @@ These run alongside the slices below; start them at day 1, not when their slice 
 - **Mocked:** report contents still the fixture, now per authenticated user.
 - **Demo milestone:** sign in with Google → see the (still-mock) report.
 
-### S5. Calendar provider — OAuth + retrieval + persistence (end-to-end)
+### S5. Calendar provider — OAuth + retrieval + persistence selected calendar
 - **Goal:** Connect Google Calendar via OAuth (separate consent from identity login;
-  `access_type=offline` + `prompt=consent`), owned-calendar selection (primary
-  pre-selected), token storage + serialized refresh, retrieve events, persist raw.
-  Establishes the integration capability pattern. *(User chose Calendar first to
-  retire the flagged-risk provider first.)*
+  `access_type=offline` + `prompt=consent`), 
+- After connection user selects at least one calendar. Owned-calendar selection (primary
+  pre-selected), token storage + serialized refresh, retrieve events. Selected calendar
+  persisted in CalendarSelection table.
 - **Mocked:** the analysis layer still uses the fixture; surface retrieved data in a
-  minimal debug view only.
-- **Demo milestone:** real Calendar data connected, retrieved, and stored per user.
+  minimal debug view only. Raw data now available in memory but not stored in database.
+- **Demo milestone:** real Calendar data connected, retrieved per user.
 - **Risk/notes:** 7-day dev re-consent loop (verification track mitigates for real
   users); revisit spike open-questions (all-day events, recurring-series expansion,
   multi-calendar pagination at scale) when this slice is planned.
 
-### S6. WHOOP provider — OAuth + retrieval + persistence (end-to-end)
+### S6. WHOOP provider — OAuth + retrieval
 - **Goal:** Same pattern as S5, conforming to the capability set there. WHOOP OAuth
   (form-urlencoded token exchange, rotating refresh — serialize server-side),
-  retrieve Cycles / Recovery / Sleep, persist raw.
-- **Mocked:** analysis layer still fixture-backed; both providers' raw data now
-  available.
-- **Demo milestone:** both real sources connected and stored.
+  retrieve Cycles / Recovery / Sleep.
+- **Mocked:** analysis layer still fixture-backed; both providers' raw data now available 
+  in memory but not stored in database.
+- **Demo milestone:** both real sources connected.
 - **Risk/notes:** join on `cycle_id` not index; gate on `score_state === "SCORED"`;
   filter naps — carry spike findings into the detailed plan.
 
@@ -141,13 +141,13 @@ These run alongside the slices below; start them at day 1, not when their slice 
 - **Mocked:** AI insight section still stubbed.
 - **Demo milestone:** real numbers and charts from real data.
 
-### S8. AI insight generation
+### S8. AI insight generation + persistence
 - **Goal:** Vercel AI SDK behind the AI capability. Build the per-finding evidence
   packet from the deterministic layer (never raw events) and generate insights with
   the five techniques (competing hypotheses, skeptical self-critique, falsifiable
   recommendations, license to find nothing, calibrated confidence). Schema-validate
   the `Finding` output before it reaches state. Replace mock insights with real AI.
-- **Mocked:** nothing — report is now fully real.
+- **Mocked:** nothing — report is now fully real are stored in database.
 - **Demo milestone:** the complete real report.
 
 ### S9. Pipeline assembly + automatic generation
