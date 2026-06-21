@@ -14,7 +14,6 @@ import type { CalendarCapability, OwnedCalendar, RawCalendarEvent } from '@/shar
 
 const makeLogger = () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn() })
 
-const NOW = new Date()
 const FUTURE = new Date(Date.now() + 60 * 60 * 1000)
 const PAST = new Date(Date.now() - 10 * 1000)
 

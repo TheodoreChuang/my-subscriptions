@@ -28,7 +28,7 @@ export function CalendarSelectionPage({
         <div className="max-w-md text-center space-y-4">
           <h1 className="text-2xl font-semibold">No owned calendars found</h1>
           <p className="text-muted-foreground">
-            We couldn't find any calendars you own on this Google account.
+            We couldn&apos;t find any calendars you own on this Google account.
           </p>
           <a
             href="/api/integrations/google-calendar/connect"
