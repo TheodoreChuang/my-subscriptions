@@ -7,9 +7,9 @@
 Assumed starting point: `npx create-next-app@latest` (gives you the scaffold, strict TS,
 lint, and a dev server). The checklist below covers what it does *not*.
 
-- [ ] `create-next-app` scaffold in place; strict TypeScript on
-- [ ] Lint, typecheck, and tests runnable locally
-- [ ] CI runs typecheck + lint + tests on pull requests
+- [x] `create-next-app` scaffold in place; strict TypeScript on
+- [x] Lint, typecheck, and tests runnable locally
+- [x] CI runs typecheck + lint + tests on pull requests
 - [ ] Env vars validated via Zod at startup (see `code-standards.md`)
 - [ ] System boundaries created — `app` / `frontend` / `modules` / `infrastructure` / `shared` (see `architecture-context.md`)
 - [ ] Capability composition-roots stubbed for the capabilities this project actually uses (see Wiring in `architecture-context.md`)

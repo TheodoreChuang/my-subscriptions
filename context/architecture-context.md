@@ -16,6 +16,12 @@
 
 ---
 
+## High-level architecture & design
+
+See `High-level architecture & design` in `README.md`
+
+---
+
 ## Core Principle
 
 One idea underpins this architecture: **depend on abstractions you own, never on
