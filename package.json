@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:reset": "supabase db reset --local && npx supabase db query \"DROP SCHEMA IF EXISTS drizzle CASCADE;\" --local && tsx scripts/migrate.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
