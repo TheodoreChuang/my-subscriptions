@@ -1,6 +1,10 @@
-import { FIXTURE } from "@/frontend/report/fixture";
-import { ReportPage } from "./ReportPage";
+import { logger } from '@/infrastructure/logger';
+import { getReport } from '@/modules';
+import { ReportPage } from './ReportPage';
 
-export default function ReportRoute() {
-  return <ReportPage report={FIXTURE} />;
+export const dynamic = 'force-dynamic';
+
+export default async function ReportRoute() {
+  const report = await getReport(logger);
+  return <ReportPage report={report} />;
 }
