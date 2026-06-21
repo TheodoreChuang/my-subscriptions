@@ -127,17 +127,21 @@ export class GoogleCalendarClient implements CalendarCapability {
       headers: { 'content-type': 'application/x-www-form-urlencoded' },
       body,
     })
-    const data = (await res.json()) as { access_token?: string; expires_in?: number; error?: string }
 
     if (!res.ok) {
-      if (data.error === 'invalid_grant') {
+      const errData = (await res.json().catch(() => ({}))) as { error?: string }
+      if (errData.error === 'invalid_grant') {
         throw new OAuthError('Google refresh token rejected', 'invalid_grant')
       }
       throw new Error(`refreshTokens failed ${res.status}`)
     }
 
+    const data = (await res.json()) as { access_token?: string; expires_in?: number }
+    if (!data.access_token) {
+      throw new Error('refreshTokens: Google response missing access_token')
+    }
     return {
-      accessToken: data.access_token!,
+      accessToken: data.access_token,
       refreshToken,
       expiresAt: new Date(Date.now() + (data.expires_in ?? 3600) * 1000),
     }

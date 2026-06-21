@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import { z } from 'zod'
 import { authCapability } from '@/infrastructure/auth'
 import { googleCalendarClient, postgresCalendarRepository } from '@/infrastructure'
+import { OAuthError } from '@/infrastructure/calendar/googleCalendar'
 import { listOwnedCalendars, updateSelections } from '@/modules'
 
 const SelectionsSchema = z.object({
@@ -28,14 +29,17 @@ export async function POST(request: NextRequest) {
   let ownedCalendars
   try {
     ownedCalendars = await listOwnedCalendars(userId, postgresCalendarRepository, googleCalendarClient)
-  } catch {
+  } catch (err) {
+    if (err instanceof OAuthError) {
+      return NextResponse.json({ error: 'Calendar connection expired. Please reconnect.' }, { status: 401 })
+    }
     return NextResponse.json({ error: 'Failed to fetch calendars' }, { status: 500 })
   }
 
   const ownedIds = new Set(ownedCalendars.map((c) => c.id))
   for (const id of selectedIds) {
     if (!ownedIds.has(id)) {
-      return NextResponse.json({ error: `Calendar ${id} is not an owned calendar` }, { status: 400 })
+      return NextResponse.json({ error: 'One or more selected calendars are not accessible' }, { status: 400 })
     }
   }
 

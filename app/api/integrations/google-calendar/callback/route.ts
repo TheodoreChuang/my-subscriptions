@@ -25,6 +25,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/onboarding?error=session_lost', env.BETTER_AUTH_URL))
   }
 
+  // Complete the CSRF check: Google must echo back exactly what we sent
+  if (searchParams.get('state') !== stateCookie) {
+    return new NextResponse('State mismatch', { status: 403 })
+  }
+
   let userId: string
   try {
     const payload = verifyState(stateCookie)
@@ -52,7 +57,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL('/onboarding?calendar_error=config_error', env.BETTER_AUTH_URL))
   }
 
-  await saveCalendarTokens(userId, tokens, 'https://www.googleapis.com/auth/calendar.readonly', postgresCalendarRepository)
+  try {
+    await saveCalendarTokens(userId, tokens, 'https://www.googleapis.com/auth/calendar.readonly', postgresCalendarRepository)
+  } catch (err) {
+    logger.error('Failed to save Google Calendar tokens', { err })
+    const response = NextResponse.redirect(new URL('/onboarding?calendar_error=failed', env.BETTER_AUTH_URL))
+    response.cookies.set(STATE_COOKIE, '', { maxAge: 0, path: '/' })
+    return response
+  }
 
   const response = NextResponse.redirect(new URL('/connect/calendar', env.BETTER_AUTH_URL))
   response.cookies.set(STATE_COOKIE, '', { maxAge: 0, path: '/' })

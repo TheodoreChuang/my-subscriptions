@@ -32,7 +32,8 @@ async function refreshTokensIfNeeded(
 
   const refreshToken = integration.refreshToken
   if (!refreshToken) {
-    throw new IntegrationNotFoundError()
+    await repo.markNeedsReconnect(userId)
+    throw new OAuthError('No refresh token — reconnect required', 'invalid_grant')
   }
 
   try {
@@ -119,11 +120,10 @@ export async function fetchEventsForWindow(
   const tokens = { ...integration, accessToken, refreshToken: integration.refreshToken ?? '' }
 
   try {
-    const allEvents: RawCalendarEvent[] = []
-    for (const sel of selectionRows) {
-      const events = await client.fetchEvents(sel.externalCalendarId, tokens, window)
-      allEvents.push(...events)
-    }
+    const eventsByCalendar = await Promise.all(
+      selectionRows.map((sel) => client.fetchEvents(sel.externalCalendarId, tokens, window)),
+    )
+    const allEvents = eventsByCalendar.flat()
     logger.info('calendar events retrieved', {
       calendarCount: selectionRows.length,
       totalEvents: allEvents.length,
