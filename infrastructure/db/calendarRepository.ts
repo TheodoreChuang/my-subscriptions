@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm'
+import { eq, and, sql } from 'drizzle-orm'
 import { db } from './client'
 import { integration, calendarSelection } from './schema'
 import type { CalendarRepository, IntegrationRow, CalendarSelectionRow } from '@/modules/calendar/calendarRepository'
@@ -51,7 +51,7 @@ export class PostgresCalendarRepository implements CalendarRepository {
         target: [integration.userId, integration.provider],
         set: {
           accessToken: tokens.accessToken,
-          refreshToken: tokens.refreshToken,
+          refreshToken: sql`COALESCE(EXCLUDED."refreshToken", "integration"."refreshToken")`,
           expiresAt: tokens.expiresAt,
           scope,
           status: 'active',
@@ -81,10 +81,14 @@ export class PostgresCalendarRepository implements CalendarRepository {
   async getSelections(userId: string): Promise<CalendarSelectionRow[]> {
     const integration_row = await this.getIntegration(userId)
     if (!integration_row) return []
+    return this.getSelectionsByIntegrationId(integration_row.id)
+  }
+
+  async getSelectionsByIntegrationId(integrationId: string): Promise<CalendarSelectionRow[]> {
     const rows = await db
       .select()
       .from(calendarSelection)
-      .where(eq(calendarSelection.integrationId, integration_row.id))
+      .where(eq(calendarSelection.integrationId, integrationId))
     return rows.map((r) => ({
       id: r.id,
       integrationId: r.integrationId,

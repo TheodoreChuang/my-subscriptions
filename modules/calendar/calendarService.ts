@@ -113,7 +113,7 @@ export async function fetchEventsForWindow(
   const integration = await repo.getIntegration(userId)
   if (!integration) throw new IntegrationNotFoundError()
 
-  const selectionRows = await repo.getSelections(userId)
+  const selectionRows = await repo.getSelectionsByIntegrationId(integration.id)
   if (selectionRows.length === 0) throw new NoSelectionsError()
 
   const accessToken = await refreshTokensIfNeeded(userId, integration, repo, client)

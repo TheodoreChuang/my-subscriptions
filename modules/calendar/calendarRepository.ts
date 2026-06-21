@@ -24,6 +24,7 @@ export interface CalendarRepository {
   markNeedsReconnect(userId: string): Promise<void>
   updateTokens(userId: string, tokens: CalendarTokens): Promise<void>
   getSelections(userId: string): Promise<CalendarSelectionRow[]>
+  getSelectionsByIntegrationId(integrationId: string): Promise<CalendarSelectionRow[]>
   saveSelections(
     integrationId: string,
     selections: Array<{ externalCalendarId: string; name: string }>,
