@@ -2,17 +2,17 @@
 
 ## Stack
 
-| Layer | Technology |
-|---------|---------|
-| Framework | Next.js + TypeScript |
-| UI | TailwindCSS + shadcn/ui |
-| Database | Supabase (Postgres) |
-| ORM | Drizzle |
-| Auth | Better Auth |
-| AI | Vercel AI SDK |
-| Validation | Zod |
-| Testing | Vitest + Playwright |
-| Deployment | Vercel |
+| Layer | Technology | AI Resource |
+|---------|---------|---------|
+| Framework | Next.js + TypeScript | https://nextjs.org/docs/llms.txt |
+| UI | TailwindCSS + shadcn/ui | https://ui.shadcn.com/llms.txt |
+| Database | Supabase (Postgres) | https://supabase.com/llms.txt |
+| ORM | Drizzle | https://orm.drizzle.team/llms.txt |
+| Auth | Better Auth | https://better-auth.com/llms.txt |
+| AI | Vercel AI SDK | https://ai-sdk.dev/llms.txt |
+| Validation | Zod | |
+| Testing | Vitest + Playwright | |
+| Deployment | Vercel | vercel.com/docs/llms.txt  |
 
 ---
 
