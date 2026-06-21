@@ -49,11 +49,6 @@ vi.mock('@/modules', async (importOriginal) => {
   }
 })
 
-// Must be mocked before importing the page
-vi.mock('./ReportPage', () => ({
-  ReportPage: vi.fn(() => null),
-}), { virtual: true })
-
 vi.mock('@/app/report/ReportPage', () => ({
   ReportPage: vi.fn(() => null),
 }))
