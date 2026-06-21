@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, boolean, unique } from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -40,6 +40,32 @@ export const account = pgTable('account', {
   createdAt: timestamp('createdAt').notNull(),
   updatedAt: timestamp('updatedAt').notNull(),
 })
+
+export const integration = pgTable('integration', {
+  id: text('id').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  category: text('category').notNull(),
+  provider: text('provider').notNull(),
+  accessToken: text('accessToken').notNull(),
+  refreshToken: text('refreshToken'),
+  expiresAt: timestamp('expiresAt').notNull(),
+  scope: text('scope'),
+  status: text('status').notNull().default('active'),
+  createdAt: timestamp('createdAt').notNull(),
+  updatedAt: timestamp('updatedAt').notNull(),
+}, (t) => [unique().on(t.userId, t.provider)])
+
+export const calendarSelection = pgTable('calendar_selection', {
+  id: text('id').primaryKey(),
+  integrationId: text('integrationId')
+    .notNull()
+    .references(() => integration.id, { onDelete: 'cascade' }),
+  externalCalendarId: text('externalCalendarId').notNull(),
+  name: text('name').notNull(),
+  createdAt: timestamp('createdAt').notNull(),
+}, (t) => [unique().on(t.integrationId, t.externalCalendarId)])
 
 export const verification = pgTable('verification', {
   id: text('id').primaryKey(),
