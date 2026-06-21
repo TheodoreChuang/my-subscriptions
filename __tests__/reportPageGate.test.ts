@@ -24,6 +24,21 @@ vi.mock('@/infrastructure', () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }))
 
+const mockOAuthError = vi.fn()
+
+vi.mock('@/infrastructure/calendar/googleCalendar', () => {
+  class OAuthError extends Error {
+    code: string
+    constructor(message: string, code: string) {
+      super(message)
+      this.name = 'OAuthError'
+      this.code = code
+    }
+  }
+  mockOAuthError.mockImplementation((msg: string, code: string) => new OAuthError(msg, code))
+  return { OAuthError }
+})
+
 vi.mock('@/modules', async (importOriginal) => {
   const original = await importOriginal<typeof import('@/modules')>()
   return {
@@ -91,5 +106,17 @@ describe('report page access gate', () => {
     await ReportRoute()
     expect(mockFetchEventsForWindow).toHaveBeenCalled()
     expect(mockGetReport).toHaveBeenCalled()
+  })
+
+  it('redirects to /onboarding when fetchEventsForWindow throws invalid_grant (R4)', async () => {
+    const { OAuthError } = await import('@/infrastructure/calendar/googleCalendar')
+    mockGetConnectionStatus.mockResolvedValue('connected')
+    mockGetSelections.mockResolvedValue([{
+      id: 's1', integrationId: 'int1', externalCalendarId: 'cal1', name: 'My Cal',
+    }])
+    mockFetchEventsForWindow.mockRejectedValue(new OAuthError('rejected', 'invalid_grant'))
+    const { default: ReportRoute } = await import('@/app/report/page')
+    await expect(ReportRoute()).rejects.toThrow('NEXT_REDIRECT:/onboarding')
+    expect(redirect).toHaveBeenCalledWith('/onboarding')
   })
 })

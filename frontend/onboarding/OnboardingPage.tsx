@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
 
 type ConnectionStatus = 'not_connected' | 'needs_reconnect' | 'connected'
 

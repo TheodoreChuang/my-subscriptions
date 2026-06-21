@@ -39,10 +39,10 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const verificedSelections = ownedCalendars.filter((c) => selectedIds.includes(c.id))
+  const verifiedSelections = ownedCalendars.filter((c) => selectedIds.includes(c.id))
   await updateSelections(
     userId,
-    verificedSelections.map((c) => ({ externalCalendarId: c.id, name: c.name })),
+    verifiedSelections.map((c) => ({ externalCalendarId: c.id, name: c.name })),
     postgresCalendarRepository,
   )
 
