@@ -39,6 +39,7 @@ function makeRepo(overrides: Partial<CalendarRepository> = {}): CalendarReposito
     markNeedsReconnect: vi.fn().mockResolvedValue(undefined),
     updateTokens: vi.fn().mockResolvedValue(undefined),
     getSelections: vi.fn().mockResolvedValue([]),
+    getSelectionsByIntegrationId: vi.fn().mockResolvedValue([]),
     saveSelections: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
@@ -144,7 +145,7 @@ describe('fetchEventsForWindow', () => {
       { id: 's1', integrationId: 'int1', externalCalendarId: 'cal1', name: 'Cal 1' },
       { id: 's2', integrationId: 'int1', externalCalendarId: 'cal2', name: 'Cal 2' },
     ]
-    const repo = makeRepo({ getSelections: vi.fn().mockResolvedValue(twoSelections) })
+    const repo = makeRepo({ getSelectionsByIntegrationId: vi.fn().mockResolvedValue(twoSelections) })
     const client = makeClient({
       fetchEvents: vi.fn()
         .mockResolvedValueOnce([event1])
@@ -159,7 +160,7 @@ describe('fetchEventsForWindow', () => {
   it('token near expiry: calls refreshTokens, updateTokens, then fetchEvents with refreshed token', async () => {
     const repo = makeRepo({
       getIntegration: vi.fn().mockResolvedValue(makeIntegration({ expiresAt: PAST })),
-      getSelections: vi.fn().mockResolvedValue(selections),
+      getSelectionsByIntegrationId: vi.fn().mockResolvedValue(selections),
     })
     const client = makeClient({ fetchEvents: vi.fn().mockResolvedValue([event1]) })
     await fetchEventsForWindow('u1', window, repo, client, makeLogger())
@@ -176,7 +177,7 @@ describe('fetchEventsForWindow', () => {
   })
 
   it('throws NoSelectionsError when no calendars selected', async () => {
-    const repo = makeRepo({ getSelections: vi.fn().mockResolvedValue([]) })
+    const repo = makeRepo({ getSelectionsByIntegrationId: vi.fn().mockResolvedValue([]) })
     const client = makeClient()
     await expect(fetchEventsForWindow('u1', window, repo, client, makeLogger())).rejects.toThrow(NoSelectionsError)
   })
@@ -186,7 +187,7 @@ describe('fetchEventsForWindow', () => {
       getIntegration: vi.fn()
         .mockResolvedValueOnce(makeIntegration({ expiresAt: PAST }))
         .mockResolvedValueOnce(makeIntegration({ expiresAt: PAST })),
-      getSelections: vi.fn().mockResolvedValue(selections),
+      getSelectionsByIntegrationId: vi.fn().mockResolvedValue(selections),
     })
     const client = makeClient({
       refreshTokens: vi.fn().mockRejectedValue(new OAuthError('rejected', 'invalid_grant')),
@@ -201,7 +202,7 @@ describe('fetchEventsForWindow', () => {
       getIntegration: vi.fn()
         .mockResolvedValueOnce(makeIntegration({ expiresAt: PAST }))
         .mockResolvedValueOnce(refreshedRow),
-      getSelections: vi.fn().mockResolvedValue(selections),
+      getSelectionsByIntegrationId: vi.fn().mockResolvedValue(selections),
     })
     const client = makeClient({
       refreshTokens: vi.fn().mockRejectedValue(new OAuthError('rejected', 'invalid_grant')),
@@ -214,7 +215,7 @@ describe('fetchEventsForWindow', () => {
   })
 
   it('logs event count and calendar IDs on success', async () => {
-    const repo = makeRepo({ getSelections: vi.fn().mockResolvedValue(selections) })
+    const repo = makeRepo({ getSelectionsByIntegrationId: vi.fn().mockResolvedValue(selections) })
     const client = makeClient({ fetchEvents: vi.fn().mockResolvedValue([event1, event2]) })
     const logger = makeLogger()
     await fetchEventsForWindow('u1', window, repo, client, logger)
