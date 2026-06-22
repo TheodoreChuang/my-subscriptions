@@ -1,15 +1,12 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { authCapability } from '@/infrastructure/auth'
-import { postgresWhoopRepository, logger } from '@/infrastructure'
+import { postgresWhoopRepository, whoopClient, logger } from '@/infrastructure'
 import { saveWhoopTokens } from '@/modules'
 import { env } from '@/shared/env'
-import { signState, verifyState } from '@/app/api/integrations/google-calendar/stateToken'
-import { WHOOP_TOKEN_URL } from '@/infrastructure/whoop/whoopClient'
+import { verifyState } from '@/app/api/integrations/google-calendar/stateToken'
 
 const WHOOP_STATE_COOKIE = 'whoop_oauth_state'
-
-export { signState }
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
@@ -47,43 +44,23 @@ export async function GET(request: NextRequest) {
 
   const redirectUri = `${env.BETTER_AUTH_URL}/api/integrations/whoop/callback`
 
-  let tokens: { access_token: string; refresh_token: string; expires_in: number; scope?: string }
+  let tokens
   try {
-    const body = new URLSearchParams({
-      grant_type: 'authorization_code',
-      code,
-      client_id: env.WHOOP_CLIENT_ID,
-      client_secret: env.WHOOP_CLIENT_SECRET,
-      redirect_uri: redirectUri,
-    })
-    const res = await fetch(WHOOP_TOKEN_URL, {
-      method: 'POST',
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      body,
-    })
-    if (!res.ok) {
-      logger.error('WHOOP token exchange failed', { status: res.status })
-      const response = NextResponse.redirect(new URL('/onboarding?whoop_error=failed', env.BETTER_AUTH_URL))
-      response.cookies.set(WHOOP_STATE_COOKIE, '', { maxAge: 0, path: '/' })
-      return response
-    }
-    tokens = (await res.json()) as typeof tokens
+    tokens = await whoopClient.exchangeCode(code, redirectUri)
   } catch (err) {
-    logger.error('WHOOP token exchange network error', { err })
+    logger.error('WHOOP token exchange failed', { err })
     const response = NextResponse.redirect(new URL('/onboarding?whoop_error=failed', env.BETTER_AUTH_URL))
     response.cookies.set(WHOOP_STATE_COOKIE, '', { maxAge: 0, path: '/' })
     return response
   }
 
-  const healthTokens = {
-    accessToken: tokens.access_token,
-    refreshToken: tokens.refresh_token,
-    expiresAt: new Date(Date.now() + tokens.expires_in * 1000),
-  }
-  const scope = tokens.scope ?? 'offline read:profile read:cycles read:sleep read:recovery'
-
   try {
-    await saveWhoopTokens(userId, healthTokens, scope, postgresWhoopRepository)
+    await saveWhoopTokens(
+      userId,
+      tokens,
+      'offline read:profile read:cycles read:sleep read:recovery',
+      postgresWhoopRepository,
+    )
   } catch (err) {
     logger.error('Failed to save WHOOP tokens', { err })
     const response = NextResponse.redirect(new URL('/onboarding?whoop_error=failed', env.BETTER_AUTH_URL))

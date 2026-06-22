@@ -5,27 +5,16 @@ export function resolveReportAccess(
   hasCalendarSelections: boolean,
   whoopStatus: ConnectionStatus,
 ): 'onboarding' | 'connect-calendar' | 'render' {
-  // Both disconnected or calendar needs reconnect with no WHOOP fallback
-  if (whoopStatus !== 'connected') {
-    if (calendarStatus === 'not_connected' || calendarStatus === 'needs_reconnect') {
-      return 'onboarding'
-    }
-    // Calendar connected but no selections and WHOOP not available
-    if (!hasCalendarSelections) {
-      return 'connect-calendar'
-    }
+  // At least one active data source — WHOOP alone is sufficient
+  if (whoopStatus === 'connected') return 'render'
+
+  // WHOOP not active; fall back to calendar-only checks
+  if (calendarStatus === 'not_connected' || calendarStatus === 'needs_reconnect') {
+    return 'onboarding'
   }
 
-  // WHOOP connected, or calendar connected with selections
-  // At least one active data source
-  if (whoopStatus === 'connected' || (calendarStatus === 'connected' && hasCalendarSelections)) {
-    return 'render'
-  }
+  // Calendar connected
+  if (!hasCalendarSelections) return 'connect-calendar'
 
-  // Calendar connected with selections, regardless of WHOOP status
-  if (calendarStatus === 'connected' && hasCalendarSelections) {
-    return 'render'
-  }
-
-  return 'onboarding'
+  return 'render'
 }

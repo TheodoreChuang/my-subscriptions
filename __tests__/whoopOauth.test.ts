@@ -10,10 +10,12 @@ vi.mock('@/infrastructure/auth', () => ({
   auth: {},
 }))
 
+const mockExchangeCode = vi.fn()
 const mockSaveWhoopTokens = vi.fn()
 
 vi.mock('@/infrastructure', () => ({
   postgresWhoopRepository: {},
+  whoopClient: { exchangeCode: mockExchangeCode },
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }))
 
@@ -44,6 +46,8 @@ const validSession = {
   user: { id: 'u1', name: 'Alice', email: 'a@a.com' },
   session: { id: 's1', expiresAt: FUTURE, userId: 'u1' },
 }
+
+const validTokens = { accessToken: 'at', refreshToken: 'rt', expiresAt: FUTURE }
 
 function makeCallbackRequest(
   params: Record<string, string>,
@@ -154,55 +158,35 @@ describe('GET /api/integrations/whoop/callback', () => {
     }
   })
 
-  it('valid flow: verifies state, exchanges code with form-urlencoded body, saves tokens, clears cookie, redirects to /onboarding', async () => {
+  it('valid flow: calls whoopClient.exchangeCode, saves tokens, clears cookie, redirects to /onboarding', async () => {
     const state = signState('u1')
     mockGetSession.mockResolvedValue(validSession)
+    mockExchangeCode.mockResolvedValue(validTokens)
     mockSaveWhoopTokens.mockResolvedValue(undefined)
-
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: true,
-      status: 200,
-      json: async () => ({ access_token: 'at', refresh_token: 'rt', expires_in: 3600, scope: 'offline' }),
-    }))
 
     const req = makeCallbackRequest({ code: 'valid-code', state }, state)
     const { GET } = await import('@/app/api/integrations/whoop/callback/route')
     const res = await GET(req)
 
-    // Verify fetch was called with URLSearchParams body
-    const [, init] = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0] as [string, RequestInit]
-    expect((init.headers as Record<string, string>)['content-type']).toBe('application/x-www-form-urlencoded')
-    expect(init.body).toBeInstanceOf(URLSearchParams)
-    const params = init.body as URLSearchParams
-    expect(params.get('grant_type')).toBe('authorization_code')
-
-    expect(mockSaveWhoopTokens).toHaveBeenCalled()
+    expect(mockExchangeCode).toHaveBeenCalledWith('valid-code', 'http://localhost:3000/api/integrations/whoop/callback')
+    expect(mockSaveWhoopTokens).toHaveBeenCalledWith('u1', validTokens, expect.any(String), expect.anything())
     expect(res.headers.get('location')).toContain('/onboarding')
     expect(res.headers.get('location')).not.toContain('whoop_error')
 
     const setCookie = res.headers.get('set-cookie') ?? ''
     expect(setCookie).toContain(WHOOP_STATE_COOKIE)
     expect(setCookie).toContain('Max-Age=0')
-
-    vi.unstubAllGlobals()
   })
 
-  it('redirects to /onboarding?whoop_error=failed when WHOOP token exchange returns non-200', async () => {
+  it('redirects to /onboarding?whoop_error=failed when whoopClient.exchangeCode throws', async () => {
     const state = signState('u1')
     mockGetSession.mockResolvedValue(validSession)
-
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
-      ok: false,
-      status: 400,
-      json: async () => ({}),
-    }))
+    mockExchangeCode.mockRejectedValue(new Error('WHOOP exchangeCode failed 400'))
 
     const req = makeCallbackRequest({ code: 'bad-code', state }, state)
     const { GET } = await import('@/app/api/integrations/whoop/callback/route')
     const res = await GET(req)
     expect(res.headers.get('location')).toContain('/onboarding?whoop_error=failed')
-
-    vi.unstubAllGlobals()
   })
 
   it('redirects to /sign-in when session is revoked between connect and callback', async () => {
