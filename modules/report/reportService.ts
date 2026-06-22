@@ -13,6 +13,7 @@ import { normalizeCalendarEvents, normalizeWhoopCycles, joinSignals } from './no
 import { computeMetrics } from './metrics'
 import { buildEvidencePacket } from './evidencePacket'
 import { generateInsights } from './aiInsights'
+import { checkReportStatus } from './reportStatus'
 
 export type ReportDeps = {
   calendarRepo: CalendarRepository
@@ -35,7 +36,22 @@ function toDateStr(d: Date): string {
   return d.toISOString().slice(0, 10)
 }
 
-export async function getReport(userId: string, deps: ReportDeps): Promise<Report> {
+/** Reads both integration rows unconditionally; returns max updatedAt, or now() if neither exists. */
+export async function computeIntegrationSnapshotAt(
+  userId: string,
+  repos: { calendarRepo: CalendarRepository; whoopRepo: WhoopRepository },
+): Promise<Date> {
+  const [calIntegration, whoopIntegration] = await Promise.all([
+    repos.calendarRepo.getIntegration(userId),
+    repos.whoopRepo.getIntegration(userId),
+  ])
+  const dates: Date[] = []
+  if (calIntegration) dates.push(calIntegration.updatedAt)
+  if (whoopIntegration) dates.push(whoopIntegration.updatedAt)
+  return dates.length > 0 ? new Date(Math.max(...dates.map((d) => d.getTime()))) : new Date()
+}
+
+async function generateReport(userId: string, deps: ReportDeps): Promise<Report> {
   const { calendarRepo, calendarClient, whoopRepo, whoopClient, aiClient, reportRepo, logger } = deps
 
   // Window: rolling last 30 days
@@ -103,20 +119,11 @@ export async function getReport(userId: string, deps: ReportDeps): Promise<Repor
     daySummaries,
   })
 
-  // Compute integration_snapshot_at from integration updatedAt values
-  const snapshotDates: Date[] = []
-  if (calendarStatus === 'connected' && hasCalendarSelections) {
-    const calIntegration = await calendarRepo.getIntegration(userId)
-    if (calIntegration) snapshotDates.push(calIntegration.updatedAt)
-  }
-  if (whoopStatus === 'connected') {
-    const whoopIntegration = await whoopRepo.getIntegration(userId)
-    if (whoopIntegration) snapshotDates.push(whoopIntegration.updatedAt)
-  }
-  const integrationSnapshotAt =
-    snapshotDates.length > 0
-      ? new Date(Math.max(...snapshotDates.map((d) => d.getTime())))
-      : new Date()
+  // Capture integration snapshot AFTER the parallel fetch — fetchEventsForWindow and
+  // fetchRawDataForWindow may call updateTokens (setting integration.updatedAt = now).
+  // Capturing before the fetch would persist a stale snapshot, causing spurious
+  // integration_changed regenerations on every load that crosses a token-expiry boundary.
+  const integrationSnapshotAt = await computeIntegrationSnapshotAt(userId, { calendarRepo, whoopRepo })
 
   // Generate AI insights — propagates error on failure (R8: no persist on failure)
   const aiOutput = await generateInsights(evidencePacket, aiClient)
@@ -146,4 +153,22 @@ export async function getReport(userId: string, deps: ReportDeps): Promise<Repor
 
   logger.info('getReport complete', { coverageDays, connectedSources })
   return report
+}
+
+export async function getReport(userId: string, deps: ReportDeps): Promise<Report> {
+  const { calendarRepo, whoopRepo, reportRepo } = deps
+
+  const [stored, currentIntegrationAt] = await Promise.all([
+    reportRepo.getReport(userId),
+    computeIntegrationSnapshotAt(userId, { calendarRepo, whoopRepo }),
+  ])
+
+  const windowEndExpected = new Date().toISOString().slice(0, 10)
+  const status = checkReportStatus(stored, currentIntegrationAt, windowEndExpected)
+
+  if (status.status === 'current') {
+    return status.report
+  }
+
+  return generateReport(userId, deps)
 }

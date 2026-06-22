@@ -1,5 +1,5 @@
 /** Application services, business rules, domain logic, and repository interfaces. */
-export { getReport } from './report/reportService';
+export { getReport, computeIntegrationSnapshotAt } from './report/reportService';
 export type { ReportDeps } from './report/reportService';
 export { checkReportStatus } from './report/reportStatus';
 export type { ReportStatus } from './report/reportStatus';
