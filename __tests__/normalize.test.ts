@@ -227,6 +227,31 @@ describe('normalizeCalendarEvents', () => {
     expect(normalizeCalendarEvents([event])).toHaveLength(0)
   })
 
+  it('merges overlapping timed events in the same category (e.g. Work block + meeting inside it)', () => {
+    // Work block 9–17 (8h), Meeting 10–11 (1h, fully contained) → should total 8h not 9h
+    const block = makeTimedEvent({ id: 'block', summary: 'Work', startDT: '2026-06-01T09:00:00Z', endDT: '2026-06-01T17:00:00Z' })
+    const meeting = makeTimedEvent({ id: 'mtg', summary: 'Team meeting', startDT: '2026-06-01T10:00:00Z', endDT: '2026-06-01T11:00:00Z' })
+    const [day] = normalizeCalendarEvents([block, meeting])
+    expect(day.activities['Work']).toBeCloseTo(8.0)
+  })
+
+  it('merges partially overlapping events in the same category', () => {
+    // Event A 9–11, Event B 10–13 → union 9–13 = 4h
+    const a = makeTimedEvent({ id: 'a', summary: 'meeting', startDT: '2026-06-01T09:00:00Z', endDT: '2026-06-01T11:00:00Z' })
+    const b = makeTimedEvent({ id: 'b', summary: 'sync', startDT: '2026-06-01T10:00:00Z', endDT: '2026-06-01T13:00:00Z' })
+    const [day] = normalizeCalendarEvents([a, b])
+    expect(day.activities['Work']).toBeCloseTo(4.0)
+  })
+
+  it('does not merge events of different categories (cross-category overlap counts independently)', () => {
+    // Work 9–17 (8h) with Gym 12–13 (1h) inside — different categories, both count
+    const work = makeTimedEvent({ id: 'w', summary: 'Work', startDT: '2026-06-01T09:00:00Z', endDT: '2026-06-01T17:00:00Z' })
+    const gym = makeTimedEvent({ id: 'g', summary: 'gym', startDT: '2026-06-01T12:00:00Z', endDT: '2026-06-01T13:00:00Z' })
+    const [day] = normalizeCalendarEvents([work, gym])
+    expect(day.activities['Work']).toBeCloseTo(8.0)
+    expect(day.activities['Exercise']).toBeCloseTo(1.0)
+  })
+
   it('returns empty array for empty input', () => {
     expect(normalizeCalendarEvents([])).toHaveLength(0)
   })
