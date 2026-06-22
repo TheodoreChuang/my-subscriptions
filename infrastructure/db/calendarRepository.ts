@@ -22,6 +22,7 @@ export class PostgresCalendarRepository implements CalendarRepository {
       expiresAt: r.expiresAt,
       scope: r.scope,
       status: r.status,
+      updatedAt: r.updatedAt,
     }
   }
 

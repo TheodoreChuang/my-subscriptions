@@ -1,0 +1,1 @@
+CREATE INDEX "reports_user_generated_at_idx" ON "reports" USING btree ("user_id","generated_at");

@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { authCapability } from '@/infrastructure/auth'
-import { googleCalendarClient, postgresCalendarRepository, postgresWhoopRepository, whoopClient, logger } from '@/infrastructure'
+import { googleCalendarClient, postgresCalendarRepository, postgresWhoopRepository, whoopClient, logger, aiClient, postgresReportRepository } from '@/infrastructure'
 import { getReport, getConnectionStatus, getWhoopConnectionStatus } from '@/modules'
 import { resolveReportAccess } from '@/modules/report/reportAccess'
 import { IntegrationNotFoundError } from '@/modules/whoop/whoopService'
@@ -34,6 +34,8 @@ export default async function ReportRoute() {
       calendarClient: googleCalendarClient,
       whoopRepo: postgresWhoopRepository,
       whoopClient,
+      aiClient,
+      reportRepo: postgresReportRepository,
       logger,
     })
   } catch (err) {

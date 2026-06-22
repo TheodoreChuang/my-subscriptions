@@ -22,7 +22,13 @@ vi.mock('@/infrastructure', () => ({
   googleCalendarClient: {},
   postgresCalendarRepository: { getSelections: mockGetSelections },
   postgresWhoopRepository: {},
+  postgresReportRepository: { saveReport: vi.fn().mockResolvedValue(undefined) },
   whoopClient: {},
+  aiClient: { generateObject: vi.fn().mockResolvedValue({
+    executiveSummary: 'Test summary.',
+    weekHighlightSummaries: [],
+    findings: [],
+  }) },
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }))
 

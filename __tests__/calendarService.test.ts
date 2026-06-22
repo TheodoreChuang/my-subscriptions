@@ -27,6 +27,7 @@ function makeIntegration(overrides: Partial<IntegrationRow> = {}): IntegrationRo
     expiresAt: FUTURE,
     scope: 'calendar.readonly',
     status: 'active',
+    updatedAt: new Date('2026-06-01'),
     ...overrides,
   }
 }

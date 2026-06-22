@@ -1,21 +1,26 @@
 import type { Logger } from '@/shared/capabilities/logger'
 import type { CalendarCapability } from '@/shared/capabilities/calendar'
 import type { HealthCapability } from '@/shared/capabilities/health'
+import type { AICapability } from '@/shared/capabilities/ai'
 import type { Report, ConnectedSource, WeekHighlight } from '@/shared/types/report'
 import type { CalendarRepository } from '@/modules/calendar/calendarRepository'
 import type { WhoopRepository } from '@/modules/whoop/whoopRepository'
+import type { ReportRepository } from './reportRepository'
 import { reportSchema } from '@/shared/schemas/report'
 import { getConnectionStatus, fetchEventsForWindow } from '@/modules/calendar/calendarService'
 import { getWhoopConnectionStatus, fetchRawDataForWindow } from '@/modules/whoop/whoopService'
 import { normalizeCalendarEvents, normalizeWhoopCycles, joinSignals } from './normalize'
 import { computeMetrics } from './metrics'
 import { buildEvidencePacket } from './evidencePacket'
+import { generateInsights } from './aiInsights'
 
 export type ReportDeps = {
   calendarRepo: CalendarRepository
   calendarClient: CalendarCapability
   whoopRepo: WhoopRepository
   whoopClient: HealthCapability
+  aiClient: AICapability
+  reportRepo: ReportRepository
   logger: Logger
 }
 
@@ -31,7 +36,7 @@ function toDateStr(d: Date): string {
 }
 
 export async function getReport(userId: string, deps: ReportDeps): Promise<Report> {
-  const { calendarRepo, calendarClient, whoopRepo, whoopClient, logger } = deps
+  const { calendarRepo, calendarClient, whoopRepo, whoopClient, aiClient, reportRepo, logger } = deps
 
   // Window: rolling last 30 days
   const windowEnd = new Date()
@@ -98,26 +103,46 @@ export async function getReport(userId: string, deps: ReportDeps): Promise<Repor
     daySummaries,
   })
 
-  // Week highlights from evidence packet (AI summary stubbed)
-  const weekHighlights: WeekHighlight[] = evidencePacket.weekStats.map((ws) => ({
+  // Compute integration_snapshot_at from integration updatedAt values
+  const snapshotDates: Date[] = []
+  if (calendarStatus === 'connected' && hasCalendarSelections) {
+    const calIntegration = await calendarRepo.getIntegration(userId)
+    if (calIntegration) snapshotDates.push(calIntegration.updatedAt)
+  }
+  if (whoopStatus === 'connected') {
+    const whoopIntegration = await whoopRepo.getIntegration(userId)
+    if (whoopIntegration) snapshotDates.push(whoopIntegration.updatedAt)
+  }
+  const integrationSnapshotAt =
+    snapshotDates.length > 0
+      ? new Date(Math.max(...snapshotDates.map((d) => d.getTime())))
+      : new Date()
+
+  // Generate AI insights — propagates error on failure (R8: no persist on failure)
+  const aiOutput = await generateInsights(evidencePacket, aiClient)
+
+  // Assemble report — merge deterministic + AI fields
+  const weekHighlights: WeekHighlight[] = evidencePacket.weekStats.map((ws, i) => ({
     label: ws.label,
     dateRange: ws.dateRange,
     recoveryPercent: ws.recoveryPercent,
-    summary: '',
+    summary: aiOutput.weekHighlightSummaries[i] ?? '',
   }))
 
-  // Assemble report with AI fields stubbed
   const report = reportSchema.parse({
     window,
     coverageDays,
     connectedSources,
-    executiveSummary: '',
+    executiveSummary: aiOutput.executiveSummary,
     weekHighlights,
     daySummaries,
     metrics,
-    findings: [],
+    findings: aiOutput.findings,
     generatedAt: new Date().toISOString(),
   })
+
+  // Persist — after successful assembly and validation
+  await reportRepo.saveReport(userId, report, integrationSnapshotAt)
 
   logger.info('getReport complete', { coverageDays, connectedSources })
   return report

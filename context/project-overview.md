@@ -47,8 +47,7 @@ recent 30 days. This window is deliberately short: it keeps the signal current, 
 it is *why* sample sizes are small — which is exactly the uncertainty the AI layer
 must reason honestly about rather than paper over.
 
-**A "day" is a calendar day — midnight to midnight in the user's timezone**, by real
-wall-clock time, not any one service's notion of a day. This is the canonical spine
+**A "day" is a calendar day — midnight to midnight UTC**. This is the canonical spine
 the timeline is keyed on: WHOOP cycles (which are physiological, not midnight-aligned)
 map onto the calendar day they mostly fall in, and calendar events join by their
 date. So "n = 26 days" on a report means 26 calendar days, uniformly across sources.

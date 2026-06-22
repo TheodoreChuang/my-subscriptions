@@ -10,6 +10,7 @@ const serverSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   WHOOP_CLIENT_ID: z.string().min(1),
   WHOOP_CLIENT_SECRET: z.string().min(1),
+  AI_GATEWAY_API_KEY: z.string().min(1),
 })
 
 const validEnv = {
@@ -21,6 +22,7 @@ const validEnv = {
   GOOGLE_CLIENT_SECRET: 'client-secret-456',
   WHOOP_CLIENT_ID: 'whoop-client-id',
   WHOOP_CLIENT_SECRET: 'whoop-client-secret',
+  AI_GATEWAY_API_KEY: 'gateway-key-123',
 }
 
 describe('server env schema', () => {
@@ -76,6 +78,15 @@ describe('server env schema', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues.some((i) => i.path.includes('WHOOP_CLIENT_SECRET'))).toBe(true)
+    }
+  })
+
+  it('rejects when AI_GATEWAY_API_KEY is absent', () => {
+    const { AI_GATEWAY_API_KEY: _, ...rest } = validEnv
+    const result = serverSchema.safeParse(rest)
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues.some((i) => i.path.includes('AI_GATEWAY_API_KEY'))).toBe(true)
     }
   })
 })

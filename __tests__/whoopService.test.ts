@@ -25,6 +25,7 @@ function makeIntegration(overrides: Partial<IntegrationRow> = {}): IntegrationRo
     expiresAt: FUTURE,
     scope: 'offline read:cycles',
     status: 'active',
+    updatedAt: new Date('2026-06-01'),
     ...overrides,
   }
 }

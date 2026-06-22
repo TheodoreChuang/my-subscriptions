@@ -1,6 +1,66 @@
 import { describe, it, expect } from "vitest";
-import { reportSchema, findingSchema, activityRecoveryDeltaSchema } from "@/shared/schemas/report";
+import { reportSchema, findingSchema, activityRecoveryDeltaSchema, aiOutputSchema } from "@/shared/schemas/report";
 import { FIXTURE } from "@/frontend/report/fixture";
+
+describe("aiOutputSchema", () => {
+  const validFinding = {
+    id: "f1",
+    type: "finding",
+    title: "Test finding",
+    description: "A description",
+    alternativeExplanation: "An alternative",
+    confidence: "medium" as const,
+  }
+
+  it("accepts minimal valid output", () => {
+    expect(() => aiOutputSchema.parse({
+      executiveSummary: "A valid summary.",
+      weekHighlightSummaries: [],
+      findings: [],
+    })).not.toThrow()
+  })
+
+  it("accepts output with 1–5 valid findings", () => {
+    expect(() => aiOutputSchema.parse({
+      executiveSummary: "Summary here.",
+      weekHighlightSummaries: ["Best week", "Worst week"],
+      findings: [validFinding],
+    })).not.toThrow()
+  })
+
+  it("rejects when executiveSummary is empty string", () => {
+    expect(() => aiOutputSchema.parse({
+      executiveSummary: "",
+      weekHighlightSummaries: [],
+      findings: [],
+    })).toThrow()
+  })
+
+  it("rejects when executiveSummary exceeds 1200 chars", () => {
+    expect(() => aiOutputSchema.parse({
+      executiveSummary: "a".repeat(1201),
+      weekHighlightSummaries: [],
+      findings: [],
+    })).toThrow()
+  })
+
+  it("rejects when findings has more than 5 entries", () => {
+    const manyFindings = Array.from({ length: 6 }, (_, i) => ({ ...validFinding, id: `f${i}` }))
+    expect(() => aiOutputSchema.parse({
+      executiveSummary: "Summary.",
+      weekHighlightSummaries: [],
+      findings: manyFindings,
+    })).toThrow()
+  })
+
+  it("rejects a finding with invalid confidence value", () => {
+    expect(() => aiOutputSchema.parse({
+      executiveSummary: "Summary.",
+      weekHighlightSummaries: [],
+      findings: [{ ...validFinding, confidence: "maybe" }],
+    })).toThrow()
+  })
+})
 
 describe("activityRecoveryDeltaSchema", () => {
   const validDelta = { activity: "Exercise", deltaPercent: 9.2, n: 14, confidence: "strong" };

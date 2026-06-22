@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
 import { authCapability } from '@/infrastructure/auth'
-import { logger, googleCalendarClient, postgresCalendarRepository, postgresWhoopRepository, whoopClient } from '@/infrastructure'
+import { logger, googleCalendarClient, postgresCalendarRepository, postgresWhoopRepository, whoopClient, aiClient, postgresReportRepository } from '@/infrastructure'
 import { getReport } from '@/modules'
 import { OAuthError } from '@/shared/capabilities/calendar'
 import { IntegrationNotFoundError } from '@/modules/whoop/whoopService'
@@ -17,6 +17,8 @@ export async function GET() {
       calendarClient: googleCalendarClient,
       whoopRepo: postgresWhoopRepository,
       whoopClient,
+      aiClient,
+      reportRepo: postgresReportRepository,
       logger,
     });
     return Response.json(report);
