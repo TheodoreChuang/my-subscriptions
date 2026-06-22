@@ -35,9 +35,13 @@ function assignCategory(summary: string): string {
 }
 
 export function normalizeWhoopCycles(raw: WhoopRawData): WhoopDaySignal[] {
+  // Prefer non-nap sleep over nap when both exist for the same cycle_id
   const sleepByCycleId = new Map<number, WhoopSleep>()
   for (const sleep of raw.sleeps) {
-    sleepByCycleId.set(sleep.cycle_id, sleep)
+    const existing = sleepByCycleId.get(sleep.cycle_id)
+    if (!existing || (existing.nap && !sleep.nap)) {
+      sleepByCycleId.set(sleep.cycle_id, sleep)
+    }
   }
 
   const recoveryByCycleId = new Map<number, WhoopRecovery>()
