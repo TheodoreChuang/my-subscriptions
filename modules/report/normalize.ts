@@ -17,7 +17,7 @@ export type CalendarDaySignal = {
 
 // Keyword→category map evaluated in order; first match wins.
 const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
-  ['Work', ['meeting', 'standup', 'sync', 'interview', 'review', 'planning', 'sprint', 'office', 'presentation', '1:1', 'onboarding']],
+  ['Work', ['work', 'meeting', 'standup', 'stand-up', 'sync', 'interview', 'review', 'planning', 'sprint', 'office', 'presentation', '1:1', '1-1', 'onboarding', 'retrospective', 'retro', 'all hands', 'all-hands', 'okr', 'kickoff', 'demo', 'debrief', 'alignment', 'check-in', 'check in']],
   ['Exercise', ['gym', 'workout', 'run', 'bike', 'swim', 'yoga', 'hike', 'pilates', 'crossfit', 'training', 'lift', 'cycling']],
   ['Family', ['family', 'kids', 'school', 'parent', 'birthday', 'wedding']],
   ['Social', ['lunch', 'coffee', 'happy hour', 'dinner', 'party', 'drinks', 'friend']],
@@ -26,10 +26,17 @@ const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
   ['Rest', ['rest', 'relax', 'day off', 'vacation', 'holiday', 'pto', 'nap']],
 ]
 
+// Patterns that require whole-word matching (substring match would produce false positives)
+const WORD_BOUNDARY_KEYWORDS = new Set(['work', 'run', 'class', 'read', 'nap', 'train'])
+
 function assignCategory(summary: string): string {
   const lower = summary.toLowerCase()
   for (const [category, keywords] of CATEGORY_KEYWORDS) {
-    if (keywords.some((kw) => lower.includes(kw))) return category
+    if (keywords.some((kw) =>
+      WORD_BOUNDARY_KEYWORDS.has(kw)
+        ? new RegExp(`\\b${kw}\\b`).test(lower)
+        : lower.includes(kw),
+    )) return category
   }
   return 'Personal'
 }

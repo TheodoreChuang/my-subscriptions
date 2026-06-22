@@ -187,6 +187,19 @@ describe('normalizeCalendarEvents', () => {
     expect(day.activities['Work']).toBeCloseTo(1.0)
   })
 
+  it('assigns Work category to an event titled "Work"', () => {
+    const event = makeTimedEvent({ summary: 'Work', startDT: '2026-06-01T09:00:00Z', endDT: '2026-06-01T17:00:00Z' })
+    const [day] = normalizeCalendarEvents([event])
+    expect(day.activities['Work']).toBeCloseTo(8.0)
+  })
+
+  it('does not misclassify "workout" as Work (word-boundary guard)', () => {
+    const event = makeTimedEvent({ summary: 'Morning workout', startDT: '2026-06-01T07:00:00Z', endDT: '2026-06-01T08:00:00Z' })
+    const [day] = normalizeCalendarEvents([event])
+    expect(day.activities['Exercise']).toBeCloseTo(1.0)
+    expect(day.activities['Work']).toBeUndefined()
+  })
+
   it('assigns Personal category when no keyword matches', () => {
     const event = makeTimedEvent({ summary: 'Random event', startDT: '2026-06-01T09:00:00Z', endDT: '2026-06-01T10:00:00Z' })
     const [day] = normalizeCalendarEvents([event])
