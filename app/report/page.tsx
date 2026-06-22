@@ -15,16 +15,13 @@ import {
   getReport,
   getConnectionStatus,
   getWhoopConnectionStatus,
-  computeIntegrationSnapshotAt,
-  checkReportStatus,
+  getReportPageStatus,
 } from '@/modules'
 import { resolveReportAccess } from '@/modules/report/reportAccess'
 import { IntegrationNotFoundError } from '@/modules/whoop/whoopService'
 import { OAuthError } from '@/shared/capabilities/calendar'
 import { ReportPage } from './ReportPage'
 import { AnalysisScreen } from './components/AnalysisScreen'
-import type { Report } from '@/shared/types/report'
-
 export const dynamic = 'force-dynamic'
 
 const reportDeps = {
@@ -38,9 +35,9 @@ const reportDeps = {
 }
 
 export async function GenerateReportContent({ userId }: { userId: string }) {
-  let report: Report
   try {
-    report = await getReport(userId, reportDeps)
+    const report = await getReport(userId, reportDeps)
+    return <ReportPage report={report} />
   } catch (err) {
     if (err instanceof OAuthError && err.code === 'invalid_grant') {
       redirect('/onboarding')
@@ -50,19 +47,17 @@ export async function GenerateReportContent({ userId }: { userId: string }) {
     }
     throw err
   }
-  return <ReportPage report={report} />
 }
 
 export default async function ReportRoute() {
   const session = await authCapability.requireSession(await headers())
   const userId = session.user.id
 
-  const [calendarStatus, whoopStatus] = await Promise.all([
+  const [calendarStatus, whoopStatus, selections] = await Promise.all([
     getConnectionStatus(userId, postgresCalendarRepository),
     getWhoopConnectionStatus(userId, postgresWhoopRepository),
+    postgresCalendarRepository.getSelections(userId),
   ])
-
-  const selections = await postgresCalendarRepository.getSelections(userId)
   const hasCalendarSelections = selections.length > 0
 
   const access = resolveReportAccess(calendarStatus, hasCalendarSelections, whoopStatus)
@@ -70,27 +65,18 @@ export default async function ReportRoute() {
   if (access === 'onboarding') redirect('/onboarding')
   if (access === 'connect-calendar') redirect('/connect/calendar')
 
-  // Fast status check — 2–3 DB reads, no pipeline
-  const windowEndExpected = new Date().toISOString().slice(0, 10)
-  const [stored, currentIntegrationAt] = await Promise.all([
-    postgresReportRepository.getReport(userId),
-    computeIntegrationSnapshotAt(userId, {
-      calendarRepo: postgresCalendarRepository,
-      whoopRepo: postgresWhoopRepository,
-    }),
-  ])
+  const pageStatus = await getReportPageStatus(userId, {
+    calendarRepo: postgresCalendarRepository,
+    whoopRepo: postgresWhoopRepository,
+    reportRepo: postgresReportRepository,
+  })
 
-  const status = checkReportStatus(stored, currentIntegrationAt, windowEndExpected)
-
-  // Fast path: report is current — no loading flash
-  if (status.status === 'current') {
-    return <ReportPage report={status.report} />
+  if (pageStatus.status === 'current') {
+    return <ReportPage report={pageStatus.report} />
   }
 
-  // Slow path: stream AnalysisScreen fallback while GenerateReportContent runs
-  const staleReport = stored?.report ?? null
   return (
-    <Suspense fallback={<AnalysisScreen staleReport={staleReport} />}>
+    <Suspense fallback={<AnalysisScreen staleReport={pageStatus.staleReport} />}>
       <GenerateReportContent userId={userId} />
     </Suspense>
   )

@@ -17,22 +17,13 @@ const mockGetConnectionStatus = vi.fn()
 const mockGetWhoopConnectionStatus = vi.fn()
 const mockGetReport = vi.fn()
 const mockGetSelections = vi.fn()
-const mockRepoGetReport = vi.fn()
-const mockGetIntegration = vi.fn()
+const mockGetReportPageStatus = vi.fn()
 
 vi.mock('@/infrastructure', () => ({
   googleCalendarClient: {},
-  postgresCalendarRepository: {
-    getSelections: mockGetSelections,
-    getIntegration: mockGetIntegration,
-  },
-  postgresWhoopRepository: {
-    getIntegration: mockGetIntegration,
-  },
-  postgresReportRepository: {
-    getReport: mockRepoGetReport,
-    saveReport: vi.fn().mockResolvedValue(undefined),
-  },
+  postgresCalendarRepository: { getSelections: mockGetSelections },
+  postgresWhoopRepository: {},
+  postgresReportRepository: { saveReport: vi.fn().mockResolvedValue(undefined) },
   whoopClient: {},
   aiClient: { generateObject: vi.fn().mockResolvedValue({
     executiveSummary: 'Test summary.',
@@ -54,8 +45,7 @@ vi.mock('@/modules', async (importOriginal) => {
     getConnectionStatus: mockGetConnectionStatus,
     getWhoopConnectionStatus: mockGetWhoopConnectionStatus,
     getReport: mockGetReport,
-    computeIntegrationSnapshotAt: vi.fn().mockResolvedValue(new Date('2026-06-01')),
-    checkReportStatus: vi.fn().mockReturnValue({ status: 'needs_generation', reason: 'no_report' }),
+    getReportPageStatus: mockGetReportPageStatus,
   }
 })
 
@@ -83,9 +73,8 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockRequireSession.mockResolvedValue(validSession)
   mockGetReport.mockResolvedValue({ findings: [], coverageDays: 30, daySummaries: [] })
-  mockRepoGetReport.mockResolvedValue(null)
+  mockGetReportPageStatus.mockResolvedValue({ status: 'needs_generation', staleReport: null })
   mockGetSelections.mockResolvedValue(noSelections)
-  mockGetIntegration.mockResolvedValue(null)
   mockGetConnectionStatus.mockResolvedValue('not_connected')
   mockGetWhoopConnectionStatus.mockResolvedValue('not_connected')
 })
@@ -134,7 +123,7 @@ describe('report page access gate', () => {
     mockGetSelections.mockResolvedValue(withSelections)
     const { default: ReportRoute } = await import('@/app/report/page')
     await ReportRoute()
-    expect(mockRepoGetReport).toHaveBeenCalledWith('u1')
+    expect(mockGetReportPageStatus).toHaveBeenCalledWith('u1', expect.any(Object))
   })
 
   it('fetchEventsForWindow and fetchRawDataForWindow are NOT called directly from the page', async () => {

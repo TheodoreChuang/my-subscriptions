@@ -48,15 +48,16 @@ export async function computeIntegrationSnapshotAt(
   const dates: Date[] = []
   if (calIntegration) dates.push(calIntegration.updatedAt)
   if (whoopIntegration) dates.push(whoopIntegration.updatedAt)
-  return dates.length > 0 ? new Date(Math.max(...dates.map((d) => d.getTime()))) : new Date()
+  if (dates.length === 0) throw new Error(`invariant: no integration rows for userId=${userId}`)
+  return new Date(Math.max(...dates.map((d) => d.getTime())))
 }
 
 async function generateReport(userId: string, deps: ReportDeps): Promise<Report> {
   const { calendarRepo, calendarClient, whoopRepo, whoopClient, aiClient, reportRepo, logger } = deps
 
-  // Window: rolling last 30 days
-  const windowEnd = new Date()
-  const windowStart = new Date(windowEnd.getTime() - 30 * 24 * 60 * 60 * 1000)
+  // Window: rolling last 30 days — fetchEnd anchors the data range
+  const fetchEnd = new Date()
+  const windowStart = new Date(fetchEnd.getTime() - 30 * 24 * 60 * 60 * 1000)
 
   // Connection check
   const [calendarStatus, whoopStatus] = await Promise.all([
@@ -78,7 +79,7 @@ async function generateReport(userId: string, deps: ReportDeps): Promise<Report>
   // Parallel fetch — tier-gated
   const fetchWindow = {
     timeMin: windowStart.toISOString(),
-    timeMax: windowEnd.toISOString(),
+    timeMax: fetchEnd.toISOString(),
   }
 
   const [rawEvents, rawWhoop] = await Promise.all([
@@ -86,7 +87,7 @@ async function generateReport(userId: string, deps: ReportDeps): Promise<Report>
       ? fetchEventsForWindow(userId, fetchWindow, calendarRepo, calendarClient, logger)
       : Promise.resolve([] as import('@/shared/capabilities/calendar').RawCalendarEvent[]),
     whoopStatus === 'connected'
-      ? fetchRawDataForWindow(userId, { startDate: windowStart, endDate: windowEnd }, whoopRepo, whoopClient, logger)
+      ? fetchRawDataForWindow(userId, { startDate: windowStart, endDate: fetchEnd }, whoopRepo, whoopClient, logger)
       : Promise.resolve({ cycles: [], sleeps: [], recoveries: [] }),
   ])
 
@@ -103,16 +104,15 @@ async function generateReport(userId: string, deps: ReportDeps): Promise<Report>
   // Metrics
   const metrics = computeMetrics(daySummaries, connectedSources, totalCalendarEvents)
 
-  // Evidence packet
-  const window = {
-    start: toDateStr(windowStart),
-    end: toDateStr(windowEnd),
-    days: 30,
-    label: formatWindowLabel(windowStart, windowEnd),
-  }
+  // Evidence packet — window uses fetchEnd as AI context
   const coverageDays = daySummaries.length
   const evidencePacket = buildEvidencePacket({
-    window,
+    window: {
+      start: toDateStr(windowStart),
+      end: toDateStr(fetchEnd),
+      days: 30,
+      label: formatWindowLabel(windowStart, fetchEnd),
+    },
     coverageDays,
     connectedSources,
     metrics,
@@ -123,10 +123,21 @@ async function generateReport(userId: string, deps: ReportDeps): Promise<Report>
   // fetchRawDataForWindow may call updateTokens (setting integration.updatedAt = now).
   // Capturing before the fetch would persist a stale snapshot, causing spurious
   // integration_changed regenerations on every load that crosses a token-expiry boundary.
-  const integrationSnapshotAt = await computeIntegrationSnapshotAt(userId, { calendarRepo, whoopRepo })
+  // Run in parallel with the AI call since both are independent at this point.
+  const [integrationSnapshotAt, aiOutput] = await Promise.all([
+    computeIntegrationSnapshotAt(userId, { calendarRepo, whoopRepo }),
+    generateInsights(evidencePacket, aiClient),
+  ])
 
-  // Generate AI insights — propagates error on failure (R8: no persist on failure)
-  const aiOutput = await generateInsights(evidencePacket, aiClient)
+  // Re-anchor window.end to save-time so a pipeline crossing UTC midnight doesn't
+  // store yesterday's date and trigger window_drift on every subsequent load.
+  const windowEnd = new Date()
+  const window = {
+    start: toDateStr(windowStart),
+    end: toDateStr(windowEnd),
+    days: 30,
+    label: formatWindowLabel(windowStart, windowEnd),
+  }
 
   // Assemble report — merge deterministic + AI fields
   const weekHighlights: WeekHighlight[] = evidencePacket.weekStats.map((ws, i) => ({
@@ -171,4 +182,24 @@ export async function getReport(userId: string, deps: ReportDeps): Promise<Repor
   }
 
   return generateReport(userId, deps)
+}
+
+export type PageReportStatus =
+  | { status: 'current'; report: Report }
+  | { status: 'needs_generation'; staleReport: Report | null }
+
+export async function getReportPageStatus(
+  userId: string,
+  repos: { calendarRepo: CalendarRepository; whoopRepo: WhoopRepository; reportRepo: ReportRepository },
+): Promise<PageReportStatus> {
+  const windowEndExpected = new Date().toISOString().slice(0, 10)
+  const [stored, currentIntegrationAt] = await Promise.all([
+    repos.reportRepo.getReport(userId),
+    computeIntegrationSnapshotAt(userId, { calendarRepo: repos.calendarRepo, whoopRepo: repos.whoopRepo }),
+  ])
+  const status = checkReportStatus(stored, currentIntegrationAt, windowEndExpected)
+  if (status.status === 'current') {
+    return { status: 'current', report: status.report }
+  }
+  return { status: 'needs_generation', staleReport: stored?.report ?? null }
 }

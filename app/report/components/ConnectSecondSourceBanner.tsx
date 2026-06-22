@@ -24,13 +24,11 @@ export function ConnectSecondSourceBanner({
   if (!copy) return null
 
   return (
-    <div className="rounded-xl p-4 flex items-center justify-between gap-4"
-      style={{ background: 'rgba(255,101,53,.06)', border: '1px solid rgba(255,101,53,.18)' }}>
+    <div className="rounded-xl p-4 flex items-center justify-between gap-4 bg-primary/6 border border-primary/18">
       <p className="text-sm text-muted-foreground">{copy.heading}</p>
       <Link
         href="/onboarding"
-        className="text-sm font-semibold whitespace-nowrap"
-        style={{ color: '#FF6535' }}
+        className="text-sm font-semibold whitespace-nowrap text-primary"
       >
         {copy.cta} →
       </Link>
