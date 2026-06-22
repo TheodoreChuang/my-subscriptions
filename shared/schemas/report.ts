@@ -38,6 +38,8 @@ export const categoryAllocationSchema = z.object({
 export const activityRecoveryDeltaSchema = z.object({
   activity: z.string(),
   deltaPercent: z.number(),
+  n: z.number(),
+  confidence: z.enum(["strong", "weak", "insufficient"]),
 });
 
 export const analysisMetricsSchema = z.object({

@@ -2,10 +2,10 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { authCapability } from '@/infrastructure/auth'
 import { googleCalendarClient, postgresCalendarRepository, postgresWhoopRepository, whoopClient, logger } from '@/infrastructure'
-import { getReport, getConnectionStatus, fetchEventsForWindow, getWhoopConnectionStatus, fetchRawDataForWindow } from '@/modules'
+import { getReport, getConnectionStatus, getWhoopConnectionStatus } from '@/modules'
 import { resolveReportAccess } from '@/modules/report/reportAccess'
 import { IntegrationNotFoundError } from '@/modules/whoop/whoopService'
-import { OAuthError } from '@/infrastructure/calendar/googleCalendar'
+import { OAuthError } from '@/shared/capabilities/calendar'
 import { ReportPage } from './ReportPage'
 
 export const dynamic = 'force-dynamic'
@@ -27,29 +27,15 @@ export default async function ReportRoute() {
   if (access === 'onboarding') redirect('/onboarding')
   if (access === 'connect-calendar') redirect('/connect/calendar')
 
-  const now = new Date()
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-
+  let report
   try {
-    if (calendarStatus === 'connected' && hasCalendarSelections) {
-      await fetchEventsForWindow(
-        userId,
-        { timeMin: thirtyDaysAgo.toISOString(), timeMax: now.toISOString() },
-        postgresCalendarRepository,
-        googleCalendarClient,
-        logger,
-      )
-    }
-
-    if (whoopStatus === 'connected') {
-      await fetchRawDataForWindow(
-        userId,
-        { startDate: thirtyDaysAgo, endDate: now },
-        postgresWhoopRepository,
-        whoopClient,
-        logger,
-      )
-    }
+    report = await getReport(userId, {
+      calendarRepo: postgresCalendarRepository,
+      calendarClient: googleCalendarClient,
+      whoopRepo: postgresWhoopRepository,
+      whoopClient,
+      logger,
+    })
   } catch (err) {
     if (err instanceof OAuthError && err.code === 'invalid_grant') {
       redirect('/onboarding')
@@ -60,6 +46,5 @@ export default async function ReportRoute() {
     throw err
   }
 
-  const report = await getReport(logger)
   return <ReportPage report={report} />
 }

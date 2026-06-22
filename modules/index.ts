@@ -1,5 +1,6 @@
 /** Application services, business rules, domain logic, and repository interfaces. */
 export { getReport } from './report/reportService';
+export type { ReportDeps } from './report/reportService';
 export {
   getConnectionStatus,
   saveCalendarTokens,

@@ -133,79 +133,15 @@ These run alongside the slices below; start them at day 1, not when their slice 
 
 ### S7. Deterministic layer — normalization + metrics + correlations
 - **Goal:** Normalize raw provider data into the common timeline (Signal →
-  `DaySummary`), including the **cycle → local-date mapping** (bucket by local date of
-  `cycle.start`, decide double-cycle days on purpose) and rule-based event
+  `DaySummary`), including the cycle → UTC-date mapping and rule-based event
   categorization. Compute activity allocation, schedule-fragmentation metrics, and
-  activity↔recovery correlations **with sample size `n` and uncertainty**. Replace the
+  activity↔recovery correlations with sample size `n` and uncertainty. Replace the
   fixture's numbers with real computed metrics.
 - **Mocked:** AI insight section still stubbed.
 - **Demo milestone:** real numbers and charts from real data.
+- **See also:** full data-flow chain and tier gating in S7–S9 shared notes.
 
-### S8. AI insight generation + persistence
-- **Goal:** Vercel AI SDK behind the AI capability. Build the per-finding evidence
-  packet from the deterministic layer (never raw events) and generate insights with
-  the five techniques (competing hypotheses, skeptical self-critique, falsifiable
-  recommendations, license to find nothing, calibrated confidence). Schema-validate
-  the `Finding` output before it reaches state. Replace mock insights with real AI.
-- **Mocked:** nothing — report is now fully real are stored in database.
-- **Demo milestone:** the complete real report.
-
-### S9. Pipeline assembly + automatic generation
-- **Goal:** Wire retrieve → normalize → metrics → AI to run **synchronously within
-  the request** (invariant #6 — no queue/cron). Implement automatic generation /
-  regenerate-on-window-drift / regenerate-on-integration-change, one-report-per-user
-  overwrite, loading states, and connection-tier gating (single-source view vs.
-  two-source correlations + relationship framing).
-- **Demo milestone:** the real automatic product flow — no "generate" button.
-- **Risk/notes:** **synchronous-pipeline latency** is the main remaining integration
-  risk and can't be exercised until S7–S8 land. Validate the end-to-end latency
-  against the request budget the moment those slices exist, not at the end.
-
-### S10. Polish — generation, then UI
-- **Goal:** Per the user's stated order. First tune AI generation quality (prompts,
-  the five techniques, calibration, "find nothing" behavior). Then visual/interaction
-  polish on the report screens.
-- **Demo milestone:** launch-quality report.
-
----
-
-## S7–S9 pipeline & interface design
-
-Recorded after an architecture review (2026-06-22). Details the data structures,
-seam contracts, and mechanics that span S7, S8, and S9. Per-slice file lists and
-test scenarios are still produced when each slice is planned.
-
-### Full data-flow chain
-
-```
-fetchEventsForWindow(userId)          →  RawCalendarEvent[]
-fetchRawDataForWindow(userId)         →  WhoopRawData { cycles, sleeps, recoveries }
-         ↓
-normalizeCalendarEvents()             →  CalendarDaySignal[] (date → { activities, eventCount })
-normalizeWhoopCycles()                →  WhoopDaySignal[]   (date → { recovery, sleepHours, strain })
-         ↓
-joinSignals()                         →  DaySummary[]       (common timeline spine)
-         ↓
-computeMetrics(daySummaries)          →  AnalysisMetrics    (n + confidence per delta)
-identifyCandidateSignals()            →  CandidateSignal[]  (notable patterns; AI interprets these)
-         ↓
-buildEvidencePacket()                 →  EvidencePacket     (compact; never raw events)
-         ↓
-generateInsights(evidencePacket)      →  { executiveSummary, weekHighlightSummaries, findings }
-         ↓
-assembleReport() → reportSchema.parse() → upsert into reports table → return Report
-```
-
-The two provider fetches are independent and must run in parallel. The AI call is
-the final blocking step; everything before it is deterministic.
-
-### S7 → S8 seam — candidate signals, not findings
-
-S7 enumerates *candidate signals* (notable deltas with n + uncertainty); S8's AI
-decides which candidates become findings and may surface zero (Technique 4).
-S7 does not know what findings will result — it knows what the data shows.
-
-### Normalization layer (internal to S7, not exported)
+#### Normalization layer (internal, not exported)
 
 ```ts
 // internal — modules/report/normalize.ts
@@ -239,7 +175,7 @@ type CalendarDaySignal = {
 - Categorize by event title → keyword rules → category → accumulate hours
 - Initial categories: Work · Exercise · Family · Social · Learning · Travel · Personal · Rest
 
-### Evidence packet (what goes to the AI)
+#### Evidence packet (S7 constructs, S8 consumes)
 
 Do not send all 30 `DaySummary` rows to the AI — that bloats tokens and invites
 re-derivation. Send pre-computed metrics + a small number of named exemplar days +
@@ -273,7 +209,17 @@ type EvidencePacket = {
 }
 ```
 
-### AI output sub-contract
+### S8. AI insight generation + persistence
+- **Goal:** Vercel AI SDK behind the AI capability. Feed the evidence packet from S7
+  (never raw events) into the model with the five techniques (competing hypotheses,
+  skeptical self-critique, falsifiable recommendations, license to find nothing,
+  calibrated confidence). Schema-validate AI output before it reaches state. Introduce
+  the `reports` table and persist the first real report.
+- **Mocked:** nothing — report is now fully real and stored in database.
+- **Demo milestone:** the complete real report.
+- **See also:** full data-flow chain and S7 → S8 seam in S7–S9 shared notes; evidence packet constructed in S7.
+
+#### AI output sub-contract
 
 The AI emits *only* these fields, validated against a narrow sub-schema before
 being merged with the deterministic fields (Invariant #7):
@@ -288,7 +234,7 @@ export const aiOutputSchema = z.object({
 })
 ```
 
-The assembled `weekHighlights` array merges deterministic stats with AI prose:
+The assembled `weekHighlights` merges deterministic stats with AI prose:
 
 ```ts
 weekHighlights: weekStats.map((w, i) => ({
@@ -297,9 +243,10 @@ weekHighlights: weekStats.map((w, i) => ({
 }))
 ```
 
-### Report persistence (new — needed by S8)
+#### Report persistence
 
-New `reports` table. One row per user, upserted on every generation run.
+New `reports` table, introduced in this slice. One row per user, upserted on every
+generation run.
 
 ```sql
 CREATE TABLE reports (
@@ -316,8 +263,7 @@ CREATE UNIQUE INDEX reports_user_id_idx ON reports (user_id);
 ```
 
 `integration_snapshot_at` = `max(updated_at)` across all integration rows at
-generation time. Staleness detection compares this to the current
-`max(updated_at)` on every report read.
+generation time. S9's staleness detection compares this on every report read.
 
 ```ts
 interface ReportRepository {
@@ -331,7 +277,19 @@ type StoredReport = {
 }
 ```
 
-### S9 — staleness detection + pipeline trigger
+### S9. Pipeline assembly + automatic generation
+- **Goal:** Wire retrieve → normalize → metrics → AI to run **synchronously within
+  the request** (invariant #6 — no queue/cron). Implement automatic generation /
+  regenerate-on-window-drift / regenerate-on-integration-change, one-report-per-user
+  overwrite, loading states, and connection-tier gating (single-source view vs.
+  two-source correlations + relationship framing).
+- **Demo milestone:** the real automatic product flow — no "generate" button.
+- **Risk/notes:** **synchronous-pipeline latency** is the main remaining integration
+  risk and can't be exercised until S7–S8 land. Validate the end-to-end latency
+  against the request budget the moment those slices exist, not at the end.
+- **See also:** full data-flow chain and tier gating in S7–S9 shared notes; `ReportRepository` introduced in S8.
+
+#### Staleness detection + pipeline trigger
 
 ```ts
 type ReportStatus =
@@ -362,6 +320,49 @@ separate `lastSelectionChangedAt` per user.
 generate; the upsert ensures only one report row exists and the second write
 simply overwrites the first. Consider a short-circuit: if a report row was
 written within the last N seconds, skip re-generation.
+
+### S10. Polish — generation, then UI
+- **Goal:** Per the user's stated order. First tune AI generation quality (prompts,
+  the five techniques, calibration, "find nothing" behavior). Then visual/interaction
+  polish on the report screens.
+- **Demo milestone:** launch-quality report.
+
+---
+
+## S7–S9 shared notes
+
+Recorded after an architecture review (2026-06-22). Contains only cross-cutting
+context that spans multiple slices. Per-slice detail lives in each slice above.
+
+### Full data-flow chain
+
+```
+fetchEventsForWindow(userId)          →  RawCalendarEvent[]
+fetchRawDataForWindow(userId)         →  WhoopRawData { cycles, sleeps, recoveries }
+         ↓
+normalizeCalendarEvents()             →  CalendarDaySignal[] (date → { activities, eventCount })
+normalizeWhoopCycles()                →  WhoopDaySignal[]   (date → { recovery, sleepHours, strain })
+         ↓
+joinSignals()                         →  DaySummary[]       (common timeline spine)
+         ↓
+computeMetrics(daySummaries)          →  AnalysisMetrics    (n + confidence per delta)
+identifyCandidateSignals()            →  CandidateSignal[]  (notable patterns; AI interprets these)
+         ↓
+buildEvidencePacket()                 →  EvidencePacket     (compact; never raw events)
+         ↓
+generateInsights(evidencePacket)      →  { executiveSummary, weekHighlightSummaries, findings }
+         ↓
+assembleReport() → reportSchema.parse() → upsert into reports table → return Report
+```
+
+The two provider fetches are independent and must run in parallel. The AI call is
+the final blocking step; everything before it is deterministic.
+
+### S7 → S8 seam — candidate signals, not findings
+
+S7 enumerates *candidate signals* (notable deltas with n + uncertainty); S8's AI
+decides which candidates become findings and may surface zero (Technique 4).
+S7 does not know what findings will result — it knows what the data shows.
 
 ### Tier gating — safety boundary, not UX rule
 

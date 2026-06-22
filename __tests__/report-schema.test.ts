@@ -1,6 +1,28 @@
 import { describe, it, expect } from "vitest";
-import { reportSchema, findingSchema } from "@/shared/schemas/report";
+import { reportSchema, findingSchema, activityRecoveryDeltaSchema } from "@/shared/schemas/report";
 import { FIXTURE } from "@/frontend/report/fixture";
+
+describe("activityRecoveryDeltaSchema", () => {
+  const validDelta = { activity: "Exercise", deltaPercent: 9.2, n: 14, confidence: "strong" };
+
+  it("accepts a valid delta with all four fields", () => {
+    expect(() => activityRecoveryDeltaSchema.parse(validDelta)).not.toThrow();
+  });
+
+  it("rejects a delta missing n", () => {
+    const { n: _, ...without } = validDelta;
+    expect(() => activityRecoveryDeltaSchema.parse(without)).toThrow();
+  });
+
+  it("rejects a delta missing confidence", () => {
+    const { confidence: _, ...without } = validDelta;
+    expect(() => activityRecoveryDeltaSchema.parse(without)).toThrow();
+  });
+
+  it("rejects a delta with confidence outside the allowed enum values", () => {
+    expect(() => activityRecoveryDeltaSchema.parse({ ...validDelta, confidence: "maybe" })).toThrow();
+  });
+});
 
 describe("reportSchema", () => {
   it("parses the full fixture without throwing", () => {

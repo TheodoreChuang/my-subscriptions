@@ -73,12 +73,12 @@ export const FIXTURE: Report = {
     highRecoveryDays: 8,
     lowRecoveryDays: 6,
     activityRecoveryDeltas: [
-      { activity: "Exercise", deltaPercent: 9.2 },
-      { activity: "Rest", deltaPercent: 7.4 },
-      { activity: "Family", deltaPercent: 3.1 },
-      { activity: "Social", deltaPercent: 1.8 },
-      { activity: "Learning", deltaPercent: -0.5 },
-      { activity: "Work", deltaPercent: -8.3 },
+      { activity: "Exercise", deltaPercent: 9.2, n: 14, confidence: "strong" },
+      { activity: "Rest", deltaPercent: 7.4, n: 11, confidence: "strong" },
+      { activity: "Family", deltaPercent: 3.1, n: 8, confidence: "weak" },
+      { activity: "Social", deltaPercent: 1.8, n: 9, confidence: "weak" },
+      { activity: "Learning", deltaPercent: -0.5, n: 6, confidence: "weak" },
+      { activity: "Work", deltaPercent: -8.3, n: 16, confidence: "strong" },
     ],
   },
   findings: [
