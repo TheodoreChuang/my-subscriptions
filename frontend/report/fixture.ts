@@ -108,7 +108,7 @@ export const FIXTURE: Report = {
     },
     {
       id: "finding-3",
-      type: "experiment",
+      type: "suggestion",
       title: "Protect Tuesday–Wednesday Evenings",
       description:
         "Your two lowest average recovery scores occur after Tuesday and Wednesday, your heaviest work days. Scheduling evening commitments on those nights compounds the strain. Clearing them for one week would test whether the recovery dip is work-load driven or evening-load driven.",
@@ -116,8 +116,8 @@ export const FIXTURE: Report = {
         "The pattern may reflect cumulative weekly fatigue peaking mid-week rather than anything specific to Tuesday–Wednesday evenings. Clearing evenings mid-week might show no improvement if the real driver is accumulated strain.",
       confidence: "medium",
       n: 26,
-      experiment: {
-        instruction:
+      suggestion: {
+        recommendation:
           "For the next 7 days, decline or reschedule any non-essential evening commitments on Tuesday and Wednesday.",
         expectedSignal:
           "Thursday recovery scores improve by 5+ percentage points compared to your current average.",

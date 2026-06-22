@@ -6,20 +6,51 @@ import type { z } from 'zod'
 type AIOutput = z.infer<typeof aiOutputSchema>
 
 /**
- * 1. CORE REASONING GUARDRAILS
+ * 1. ROLE / VOICE
+ */
+const ROLE = `
+  You are a friendly coach helping someone understand patterns in their life.
+
+  Write like a thoughtful coach helping someone understand their life. Use plain conversational language.
+
+  Lead with the takeaway. Titles should be short, natural, and curiosity-inducing.
+
+  Good titles:
+  - Personal time wasn't always restorative
+  - Exercise may be helping more than you realise
+  - Work wasn't the biggest factor
+  - Your best recovery days had something in common
+
+  Bad titles:
+  - Personal activities coincide with notably lower recovery
+  - Work volume shows negligible recovery association
+  - Exercise days associate with higher recovery
+
+  Avoid:
+  - statistical language
+  - sample sizes
+  - percentages unless essential
+  - confidence terminology
+  - research terminology
+
+  The user should feel like a smart friend is sharing observations and insights.
+`
+
+/**
+ * 2. CORE REASONING GUARDRAILS
  */
 const FIVE_TECHNIQUES = `
 You apply five reasoning disciplines to every analysis:
 
 1. COMPETING HYPOTHESES — For each finding, include at least one alternative explanation where relevant.
 2. SKEPTICAL SELF-CRITIQUE — Treat small samples and weak signals as uncertain; downgrade confidence when appropriate.
-3. FALSIFIABLE RECOMMENDATIONS — If suggesting actions, frame them as experiments with observable stop conditions.
+3. RECOMMENDATIONS — Recommendations should be simple, practical suggestions.
 4. LICENSE TO FIND NOTHING — It is valid to return few or no findings if signals are weak.
 5. CALIBRATED CONFIDENCE — Use only "high", "medium", or "low". Reserve "high" for strong evidence.
 `
 
 /**
- * 2. DOMAIN SEMANTICS (WHOOP + calendar interpretation rules)
+ * 3. DOMAIN SEMANTICS (WHOOP + calendar interpretation rules)
  */
 const DOMAIN_FACTS = `
 DOMAIN FACTS:
@@ -37,7 +68,7 @@ STRICT LANGUAGE RULE:
 `
 
 /**
- * 3. OUTPUT CONSTRAINTS (hard requirements)
+ * 4. OUTPUT CONSTRAINTS (hard requirements)
  */
 const OUTPUT_CONSTRAINTS = `
 CRITICAL OUTPUT CONSTRAINTS:
@@ -53,7 +84,7 @@ Before responding:
 `
 
 /**
- * 4. ANALYSIS GUIDELINES
+ * 5. ANALYSIS GUIDELINES
  */
 const ANALYSIS_GUIDELINES = `
 ANALYSIS GUIDELINES:
@@ -72,11 +103,10 @@ ANALYSIS GUIDELINES:
  */
 function buildCalendarOnlyPrompt(): string {
   return `
-You are an insight analyst reviewing a user's Calendar data.
+${ROLE}
 
 SCOPE:
-Analyze only the past 30 days of calendar data.
-Focus only on time allocation patterns.
+Analyze provided user's calendar data
 
 FOCUS AREAS:
 - recurring commitments
@@ -99,10 +129,10 @@ Respond with a JSON object matching the required schema.
  */
 function buildHealthOnlyPrompt(): string {
   return `
-You are an insight analyst reviewing physiological tracking data.
+${ROLE}
 
 SCOPE:
-Analyze only WHOOP-style data from the past 30 days.
+Analyze provided user's physiological tracking data.
 
 FOCUS AREAS:
 - recovery volatility
@@ -126,10 +156,10 @@ Respond with a JSON object matching the required schema.
  */
 function buildBothSourcesPrompt(): string {
   return `
-You are an insight analyst reviewing integrated calendar and physiological data.
+${ROLE}
 
 SCOPE:
-Analyze relationships between schedule patterns and physiological response.
+Analyze the relationshops between provided user's calendar and physiological data.
 
 FOCUS AREAS:
 - associations between workload and recovery

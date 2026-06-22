@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const connectedSourceSchema = z.enum(["calendar", "health"]);
 
-export const findingTypeSchema = z.enum(["finding", "surprise", "experiment"]);
+export const findingTypeSchema = z.enum(["finding", "surprise", "suggestion"]);
 
 export const findingSchema = z.object({
   id: z.string(),
@@ -13,9 +13,9 @@ export const findingSchema = z.object({
   confidence: z.enum(["high", "medium", "low"]),
   n: z.number().optional(),
   whatWouldChangeMind: z.string().optional(),
-  experiment: z
+  suggestion: z
     .object({
-      instruction: z.string(),
+      recommendation: z.string(),
       expectedSignal: z.string(),
       killCondition: z.string(),
     })

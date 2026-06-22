@@ -112,16 +112,16 @@ describe("reportSchema", () => {
     expect(() => findingSchema.parse(invalid)).toThrow();
   });
 
-  it("rejects a finding.experiment with expectedSignal omitted", () => {
+  it("rejects a finding.suggestion with expectedSignal omitted", () => {
     const invalid = {
       id: "x",
-      type: "experiment",
+      type: "suggestion",
       title: "T",
       description: "D",
       alternativeExplanation: "A",
       confidence: "medium",
-      experiment: {
-        instruction: "Do this",
+      suggestion: {
+        recommendation: "Do this",
         // expectedSignal intentionally omitted
         killCondition: "Stop when",
       },

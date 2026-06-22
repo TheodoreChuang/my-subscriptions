@@ -223,8 +223,7 @@ small-sample uncertainty (~30 days, n ≈ 26):
    explanations including at least one confound or reverse-causation account.
 2. **Skeptical self-critique** — inline critic pass: each claim must survive "is
    this distinguishable from noise at this n?" Claims that don't are downgraded or cut.
-3. **Falsifiable experiments** — every recommendation is framed as a cheap natural
-   experiment with an expected signal and a kill condition.
+3. **Recommendation** — practical recommendation
 4. **License to find nothing** — the prompt explicitly permits the conclusion
    "nothing here is distinguishable from noise yet," rewarding restraint over
    manufactured insight.
@@ -272,3 +271,22 @@ without passing that gate.
 
 
 ## (Optional) Screenshots or a short demo video
+
+
+## Future Enhancements
+
+- **~1 day:**
+    - basic app functionality (e.g. log out, better navigation)
+    - improved calendar categorization
+    - weekly reports or selectable time ranges (e.g. last 7/14/30/60 days)?
+- **~5 days:**
+    - review security posture
+    - trend analysis (e.g. last 30 days vs previous 30 days)
+    - insight history
+    - correlation visualizations
+    - multi-calendar selection across multiple Google accounts
+- **~20 days:**
+    - productionization integration OAuth apps
+    - consider additional integrations of existing categories (e.g. health: Strava)
+    - consider additional integrations categorises (e.g. time tracker: Toggl)
+    - consider additional sign in providers
