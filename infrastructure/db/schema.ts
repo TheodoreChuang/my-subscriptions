@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, boolean, unique } from 'drizzle-orm/pg-core'
+import { pgTable, text, timestamp, boolean, unique, uuid, jsonb, date } from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -66,6 +66,19 @@ export const calendarSelection = pgTable('calendar_selection', {
   name: text('name').notNull(),
   createdAt: timestamp('createdAt').notNull(),
 }, (t) => [unique().on(t.integrationId, t.externalCalendarId)])
+
+export const reports = pgTable('reports', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => user.id),
+  data: jsonb('data').notNull(),
+  windowStart: date('window_start').notNull(),
+  windowEnd: date('window_end').notNull(),
+  generatedAt: timestamp('generated_at', { withTimezone: true }).notNull(),
+  integrationSnapshotAt: timestamp('integration_snapshot_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
 
 export const verification = pgTable('verification', {
   id: text('id').primaryKey(),

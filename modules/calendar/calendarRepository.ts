@@ -9,6 +9,7 @@ export type IntegrationRow = {
   expiresAt: Date
   scope: string | null
   status: string
+  updatedAt: Date
 }
 
 export type CalendarSelectionRow = {

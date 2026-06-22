@@ -23,6 +23,7 @@ export class PostgresWhoopRepository implements WhoopRepository {
       expiresAt: r.expiresAt,
       scope: r.scope,
       status: r.status,
+      updatedAt: r.updatedAt,
     }
   }
 

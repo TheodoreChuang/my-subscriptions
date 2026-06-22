@@ -28,6 +28,7 @@ const serverSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   WHOOP_CLIENT_ID: z.string().min(1),
   WHOOP_CLIENT_SECRET: z.string().min(1),
+  AI_GATEWAY_API_KEY: z.string().min(1),
 })
 
 // NEXT_PUBLIC_ vars — safe to expose to the browser. Empty for S1.
