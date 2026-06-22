@@ -54,7 +54,12 @@ const validSession = {
 
 function makeRequest(params: Record<string, string>, stateCookieValue?: string): NextRequest {
   const url = new URL('http://localhost:3000/api/integrations/google-calendar/callback')
-  for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v)
+  // Google echoes the state param back; mirror that when a state cookie is set
+  const queryParams =
+    stateCookieValue !== undefined && params.state === undefined
+      ? { ...params, state: stateCookieValue }
+      : params
+  for (const [k, v] of Object.entries(queryParams)) url.searchParams.set(k, v)
   const req = new NextRequest(url)
   if (stateCookieValue !== undefined) {
     Object.defineProperty(req, 'cookies', {
