@@ -4,6 +4,7 @@ import { authCapability } from '@/infrastructure/auth'
 import { googleCalendarClient, postgresCalendarRepository, postgresWhoopRepository, whoopClient, logger } from '@/infrastructure'
 import { getReport, getConnectionStatus, fetchEventsForWindow, getWhoopConnectionStatus, fetchRawDataForWindow } from '@/modules'
 import { resolveReportAccess } from '@/modules/report/reportAccess'
+import { IntegrationNotFoundError } from '@/modules/whoop/whoopService'
 import { OAuthError } from '@/infrastructure/calendar/googleCalendar'
 import { ReportPage } from './ReportPage'
 
@@ -51,6 +52,9 @@ export default async function ReportRoute() {
     }
   } catch (err) {
     if (err instanceof OAuthError && err.code === 'invalid_grant') {
+      redirect('/onboarding')
+    }
+    if (err instanceof IntegrationNotFoundError) {
       redirect('/onboarding')
     }
     throw err

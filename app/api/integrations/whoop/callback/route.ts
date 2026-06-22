@@ -4,7 +4,7 @@ import { authCapability } from '@/infrastructure/auth'
 import { postgresWhoopRepository, whoopClient, logger } from '@/infrastructure'
 import { saveWhoopTokens } from '@/modules'
 import { env } from '@/shared/env'
-import { verifyState } from '@/app/api/integrations/google-calendar/stateToken'
+import { verifyState } from '@/shared/stateToken'
 
 const WHOOP_STATE_COOKIE = 'whoop_oauth_state'
 

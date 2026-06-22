@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { authCapability } from '@/infrastructure/auth'
 import { env } from '@/shared/env'
-import { signState } from '@/app/api/integrations/google-calendar/stateToken'
+import { signState } from '@/shared/stateToken'
 
 const WHOOP_AUTH_URL = 'https://api.prod.whoop.com/oauth/oauth2/auth'
 const WHOOP_STATE_COOKIE = 'whoop_oauth_state'

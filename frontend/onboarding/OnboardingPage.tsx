@@ -61,12 +61,7 @@ function OnboardingContent({
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm">📅</div>
               <div>
                 <span className="font-medium">Google Calendar</span>
-                {calendarStatus === 'connected' && (
-                  <p className="text-xs text-muted-foreground">Time allocation · event patterns</p>
-                )}
-                {calendarStatus === 'not_connected' && (
-                  <p className="text-xs text-muted-foreground">Time allocation · event patterns</p>
-                )}
+                <p className="text-xs text-muted-foreground">Time allocation · event patterns</p>
               </div>
             </div>
             {calendarStatus !== 'not_connected' && (

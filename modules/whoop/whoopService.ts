@@ -55,9 +55,9 @@ export async function fetchRawDataForWindow(
     let newTokens: HealthTokens
     try {
       newTokens = await client.refreshTokens(currentRefreshToken)
-    } catch (err) {
+    } catch {
       await repo.markNeedsReconnect(userId)
-      throw err
+      throw new OAuthError('WHOOP token refresh failed', 'invalid_grant')
     }
 
     // Compare-and-swap: only update if the stored refresh token hasn't already changed
@@ -84,7 +84,7 @@ export async function fetchRawDataForWindow(
     data = await client.fetchRawData(tokens, window)
   } catch (err) {
     // HTTP 401 from any data endpoint signals auth failure
-    if (err instanceof Error && err.message.includes('401')) {
+    if (err instanceof Error && err.message.includes('failed 401')) {
       await repo.markNeedsReconnect(userId)
       throw new OAuthError('WHOOP access token rejected', 'invalid_grant')
     }
