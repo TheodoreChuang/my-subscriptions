@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm'
+import { desc, eq } from 'drizzle-orm'
 import { db } from './client'
 import { reports } from './schema'
 import type { ReportRepository, StoredReport } from '@/modules/report/reportRepository'
@@ -10,6 +10,7 @@ export class PostgresReportRepository implements ReportRepository {
       .select()
       .from(reports)
       .where(eq(reports.userId, userId))
+      .orderBy(desc(reports.generatedAt))
       .limit(1)
     if (rows.length === 0) return null
     const r = rows[0]
@@ -31,16 +32,6 @@ export class PostgresReportRepository implements ReportRepository {
         generatedAt: new Date(report.generatedAt),
         integrationSnapshotAt,
         createdAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [reports.userId],
-        set: {
-          data: report,
-          windowStart: report.window.start,
-          windowEnd: report.window.end,
-          generatedAt: new Date(report.generatedAt),
-          integrationSnapshotAt,
-        },
       })
   }
 }
