@@ -35,9 +35,9 @@ const reportDeps = {
 }
 
 export async function GenerateReportContent({ userId }: { userId: string }) {
+  let report
   try {
-    const report = await getReport(userId, reportDeps)
-    return <ReportPage report={report} />
+    report = await getReport(userId, reportDeps)
   } catch (err) {
     if (err instanceof OAuthError && err.code === 'invalid_grant') {
       redirect('/onboarding')
@@ -47,6 +47,7 @@ export async function GenerateReportContent({ userId }: { userId: string }) {
     }
     throw err
   }
+  return <ReportPage report={report} />
 }
 
 export default async function ReportRoute() {

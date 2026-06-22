@@ -19,12 +19,11 @@ const ROLE = `
   - Personal time wasn't always restorative
   - Exercise may be helping more than you realise
   - Work wasn't the biggest factor
-  - Your best recovery days had something in common
 
   Bad titles:
-  - Personal activities coincide with notably lower recovery
-  - Work volume shows negligible recovery association
-  - Exercise days associate with higher recovery
+  - Personal activities coincide with notably higher stress
+  - Work volume shows negligible strain association
+  - Exercise days associate with lower strain
 
   Avoid:
   - statistical language

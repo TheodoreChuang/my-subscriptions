@@ -38,37 +38,6 @@ function ConfidenceDots({ confidence, darkMode = false }: { confidence: Finding[
   );
 }
 
-function AlternativeBlock({
-  text,
-  darkMode = false,
-}: {
-  text: string;
-  darkMode?: boolean;
-}) {
-  if (darkMode) {
-    return (
-      <div className="rounded-md px-3 py-2" style={{ backgroundColor: "#2C2C2E" }}>
-        <p className="text-xs font-semibold mb-1" style={{ color: "#888888" }}>
-          ALTERNATIVE
-        </p>
-        <p className="text-xs" style={{ color: "#888888" }}>
-          {text}
-        </p>
-      </div>
-    );
-  }
-  return (
-    <div className="rounded-md px-3 py-2" style={{ backgroundColor: "#F5F0E8" }}>
-      <p className="text-xs font-semibold mb-1" style={{ color: "#888888" }}>
-        ALTERNATIVE
-      </p>
-      <p className="text-xs" style={{ color: "#888888" }}>
-        {text}
-      </p>
-    </div>
-  );
-}
-
 export function InsightCard({ finding }: { finding: Finding }) {
   const badge = TYPE_BADGE[finding.type];
 
