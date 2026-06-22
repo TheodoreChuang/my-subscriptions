@@ -36,9 +36,9 @@ describe("aiOutputSchema", () => {
     })).toThrow()
   })
 
-  it("rejects when executiveSummary exceeds 2000 chars", () => {
+  it("rejects when executiveSummary exceeds 1000 chars", () => {
     expect(() => aiOutputSchema.parse({
-      executiveSummary: "a".repeat(2001),
+      executiveSummary: "a".repeat(1001),
       weekHighlightSummaries: [],
       findings: [],
     })).toThrow()

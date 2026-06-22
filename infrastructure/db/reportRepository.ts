@@ -3,6 +3,7 @@ import { db } from './client'
 import { reports } from './schema'
 import type { ReportRepository, StoredReport } from '@/modules/report/reportRepository'
 import type { Report } from '@/shared/types/report'
+import { reportSchema } from '@/shared/schemas/report'
 
 export class PostgresReportRepository implements ReportRepository {
   async getReport(userId: string): Promise<StoredReport | null> {
@@ -15,7 +16,7 @@ export class PostgresReportRepository implements ReportRepository {
     if (rows.length === 0) return null
     const r = rows[0]
     return {
-      report: r.data as Report,
+      report: reportSchema.parse(r.data),
       integrationSnapshotAt: r.integrationSnapshotAt,
     }
   }

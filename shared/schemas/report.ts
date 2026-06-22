@@ -73,9 +73,9 @@ export const reportWindowSchema = z.object({
 });
 
 export const aiOutputSchema = z.object({
-  executiveSummary: z.string().min(1).max(2000),
+  executiveSummary: z.string().min(1).max(1000),
   weekHighlightSummaries: z.array(z.string()),
-  findings: z.array(findingSchema).min(0).max(5),
+  findings: z.array(findingSchema).max(5),
 })
 
 export const reportSchema = z.object({

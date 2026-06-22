@@ -157,6 +157,10 @@ export async function generateInsights(
   packet: EvidencePacket,
   aiClient: AICapability,
 ): Promise<AIOutput> {
+  if (packet.connectedSources.length === 0) {
+    throw new Error('generateInsights called with no connected sources')
+  }
+
   const hasCalendar = packet.connectedSources.includes('calendar')
   const hasHealth = packet.connectedSources.includes('health')
 

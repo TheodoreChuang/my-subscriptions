@@ -105,7 +105,7 @@ export async function getReport(userId: string, deps: ReportDeps): Promise<Repor
 
   // Compute integration_snapshot_at from integration updatedAt values
   const snapshotDates: Date[] = []
-  if (calendarStatus === 'connected') {
+  if (calendarStatus === 'connected' && hasCalendarSelections) {
     const calIntegration = await calendarRepo.getIntegration(userId)
     if (calIntegration) snapshotDates.push(calIntegration.updatedAt)
   }

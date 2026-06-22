@@ -1,7 +1,10 @@
 import { createGateway, generateObject } from 'ai'
 import type { AICapability } from '@/shared/capabilities/ai'
 
-const gateway = createGateway()
+let gateway: ReturnType<typeof createGateway> | null = null
+function getGateway() {
+  return (gateway ??= createGateway())
+}
 
 export class GatewayAIClient implements AICapability {
   async generateObject<T>(config: {
@@ -10,7 +13,7 @@ export class GatewayAIClient implements AICapability {
     schema: import('zod').ZodSchema<T>
   }): Promise<T> {
     const { object } = await generateObject({
-      model: gateway('anthropic/claude-haiku-4-5'),
+      model: getGateway()('anthropic/claude-haiku-4-5'),
       system: config.system,
       prompt: config.prompt,
       schema: config.schema,
