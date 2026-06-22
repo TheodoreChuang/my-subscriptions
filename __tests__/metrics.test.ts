@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { computeMetrics, HIGH_RECOVERY_THRESHOLD, LOW_RECOVERY_THRESHOLD } from '@/modules/report/metrics'
 import type { DaySummary } from '@/shared/types/report'
-import type { ConnectedSource } from '@/shared/types/report'
 
 function makeDay(overrides: Partial<DaySummary> & { date: string }): DaySummary {
   return {

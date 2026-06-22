@@ -27,15 +27,15 @@ export default async function ReportRoute() {
   if (access === 'onboarding') redirect('/onboarding')
   if (access === 'connect-calendar') redirect('/connect/calendar')
 
+  let report
   try {
-    const report = await getReport(userId, {
+    report = await getReport(userId, {
       calendarRepo: postgresCalendarRepository,
       calendarClient: googleCalendarClient,
       whoopRepo: postgresWhoopRepository,
       whoopClient,
       logger,
     })
-    return <ReportPage report={report} />
   } catch (err) {
     if (err instanceof OAuthError && err.code === 'invalid_grant') {
       redirect('/onboarding')
@@ -45,4 +45,6 @@ export default async function ReportRoute() {
     }
     throw err
   }
+
+  return <ReportPage report={report} />
 }

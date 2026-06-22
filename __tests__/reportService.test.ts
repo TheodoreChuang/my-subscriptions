@@ -4,7 +4,7 @@ import { reportSchema } from '@/shared/schemas/report'
 import type { CalendarRepository, IntegrationRow, CalendarSelectionRow } from '@/modules/calendar/calendarRepository'
 import type { CalendarCapability, RawCalendarEvent } from '@/shared/capabilities/calendar'
 import type { WhoopRepository } from '@/modules/whoop/whoopRepository'
-import type { HealthCapability, HealthTokens } from '@/shared/capabilities/health'
+import type { HealthCapability } from '@/shared/capabilities/health'
 import type { WhoopRawData, WhoopCycle, WhoopSleep, WhoopRecovery } from '@/shared/types/whoop'
 
 const makeLogger = () => ({ info: vi.fn(), warn: vi.fn(), error: vi.fn() })
