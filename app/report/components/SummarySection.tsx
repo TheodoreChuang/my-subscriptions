@@ -54,9 +54,16 @@ export function SummarySection({ report }: { report: Report }) {
 
       {report.metrics.topCategories && report.metrics.topCategories.length > 0 && (
         <div className="mb-8">
-          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-            Time Allocation
-          </h2>
+          <div className="flex items-baseline gap-2 mb-3">
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Time Allocation
+            </h2>
+            {report.metrics.totalScheduledHours != null && (
+              <span className="text-xs text-muted-foreground">
+                of {Math.round(report.metrics.totalScheduledHours)}h tracked
+              </span>
+            )}
+          </div>
           <div
             className="h-3 rounded-full overflow-hidden flex"
             role="img"
