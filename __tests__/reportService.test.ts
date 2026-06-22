@@ -44,6 +44,7 @@ function makeCalRepo(overrides: Partial<CalendarRepository> = {}): CalendarRepos
     getSelections: vi.fn().mockResolvedValue(withSelections),
     getSelectionsByIntegrationId: vi.fn().mockResolvedValue(withSelections),
     saveSelections: vi.fn().mockResolvedValue(undefined),
+    touchIntegration: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
 }
