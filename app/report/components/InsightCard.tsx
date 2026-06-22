@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 const TYPE_BADGE: Record<Finding["type"], { bg: string; text: string; label: string }> = {
   finding: { bg: "#E8F0FE", text: "#1A56DB", label: "Finding" },
   surprise: { bg: "#FFF3E0", text: "#E65100", label: "Surprise" },
-  experiment: { bg: "rgba(255,101,53,0.2)", text: "#FF6535", label: "Try this" },
+  suggestion: { bg: "rgba(255,101,53,0.2)", text: "#FF6535", label: "Try this" },
 };
 
 const CONFIDENCE_COLOR: Record<Finding["confidence"], string> = {
@@ -72,7 +72,7 @@ function AlternativeBlock({
 export function InsightCard({ finding }: { finding: Finding }) {
   const badge = TYPE_BADGE[finding.type];
 
-  if (finding.type === "experiment") {
+  if (finding.type === "suggestion") {
     return (
       <div className="rounded-xl p-5 space-y-3" style={{ backgroundColor: "#1C1C1E" }}>
         <div className="flex items-start justify-between gap-3">
@@ -93,23 +93,19 @@ export function InsightCard({ finding }: { finding: Finding }) {
           {finding.description}
         </p>
 
-        {finding.alternativeExplanation && (
-          <AlternativeBlock text={finding.alternativeExplanation} darkMode />
-        )}
-
-        {finding.experiment && (
+        {finding.suggestion && (
           <div className="space-y-2 pt-1">
             <div>
               <p className="text-xs font-medium mb-0.5" style={{ color: "#888888" }}>Do</p>
-              <p className="text-xs" style={{ color: "#CCCCCC" }}>{finding.experiment.instruction}</p>
+              <p className="text-xs" style={{ color: "#CCCCCC" }}>{finding.suggestion.recommendation}</p>
             </div>
             <div>
               <p className="text-xs font-medium mb-0.5" style={{ color: "#888888" }}>Success looks like</p>
-              <p className="text-xs" style={{ color: "#CCCCCC" }}>{finding.experiment.expectedSignal}</p>
+              <p className="text-xs" style={{ color: "#CCCCCC" }}>{finding.suggestion.expectedSignal}</p>
             </div>
             <div>
               <p className="text-xs font-medium mb-0.5" style={{ color: "#888888" }}>Stop when</p>
-              <p className="text-xs" style={{ color: "#CCCCCC" }}>{finding.experiment.killCondition}</p>
+              <p className="text-xs" style={{ color: "#CCCCCC" }}>{finding.suggestion.killCondition}</p>
             </div>
           </div>
         )}
@@ -134,17 +130,6 @@ export function InsightCard({ finding }: { finding: Finding }) {
         </div>
 
         <p className="text-sm text-foreground">{finding.description}</p>
-
-        {finding.alternativeExplanation && (
-          <AlternativeBlock text={finding.alternativeExplanation} />
-        )}
-
-        {finding.type === "finding" && finding.whatWouldChangeMind && (
-          <div className="text-xs text-muted-foreground border-t pt-2">
-            <span className="font-medium">What would change my mind: </span>
-            {finding.whatWouldChangeMind}
-          </div>
-        )}
       </CardContent>
     </Card>
   );
