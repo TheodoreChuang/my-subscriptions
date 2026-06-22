@@ -251,8 +251,12 @@ without passing that gate.
 - **Small sample by design.** The 30-day rolling window means `n` is genuinely
   small (~26 usable days). The AI is instructed to reason honestly about this, but
   findings will often be low confidence.
-- **Single user, no report history.** One report per user, overwritten on every
-  generation. No versioning, no trend across reports.
+- **Single user, no report history.** One report per user; the `reports` table grows
+  one row per generation (latest is always read). No versioning, no trend across reports.
+- **Concurrent tab generation.** If two browser tabs open simultaneously on a day when
+  the report needs regenerating, both trigger independent AI calls. The second call's
+  result just becomes the next "latest" row. Impact: wasted AI compute; users see
+  identical reports. A `BroadcastChannel` lock would fix this but isn't implemented.
 - **Google OAuth unverified.** Until the app passes Google's OAuth verification,
   non-test users see an "unverified app" warning and refresh tokens expire after
   7 days.
