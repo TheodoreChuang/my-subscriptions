@@ -111,20 +111,8 @@ export function InsightCard({ finding }: { finding: Finding }) {
               <p className="text-xs font-medium mb-0.5" style={{ color: "#888888" }}>Stop when</p>
               <p className="text-xs" style={{ color: "#CCCCCC" }}>{finding.experiment.killCondition}</p>
             </div>
-            <button
-              disabled
-              aria-label="Available after Calendar is connected."
-              className="mt-2 w-full rounded-lg py-2.5 text-sm font-semibold cursor-not-allowed"
-              style={{ backgroundColor: "#FF6535", color: "#FFFFFF", opacity: 0.7 }}
-            >
-              Add to calendar
-            </button>
           </div>
         )}
-
-        <p className="text-xs" style={{ color: "#666666" }}>
-          {finding.confidence} confidence · n={finding.n}
-        </p>
       </div>
     );
   }
