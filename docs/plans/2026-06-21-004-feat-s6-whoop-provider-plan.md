@@ -45,20 +45,22 @@ Calendar's stable refresh token does not.
 
 ---
 
-## S5 Assumed Contract
+## S5 Contract
 
-S6 depends on S5 having established the surfaces below. Confirm these match the shipped
-S5 before implementing U3 (the callback stores tokens) and U5 (onboarding page update).
+S6 builds on these S5 surfaces. WHOOP mirrors each calendar pattern with its own provider value.
 
-| Surface | Expected from S5 |
+| Surface | Contract |
 |---|---|
-| `integration` table | `id`, `userId`, `provider`, `accessToken`, `refreshToken`, `expiresAt`, `scope`, `status`, `createdAt`, `updatedAt`; unique on `(userId, provider)` |
-| `IntegrationRow` type | Drizzle-inferred from `infrastructure/db/schema.ts` `integration` table; shared between CalendarRepository and WhoopRepository |
-| State cookie CSRF pattern | HMAC-SHA256 signed with `BETTER_AUTH_SECRET`; `{ userId, exp }` payload; HTTP-only `SameSite=Lax` `max-age=300` |
-| `getConnectionStatus` return shape | `'not_connected' \| 'needs_reconnect' \| 'connected'` |
-| `/onboarding` RSC page | At `app/onboarding/page.tsx`; currently passes only `calendarStatus` to `<OnboardingPage>`; S6 adds `whoopStatus` |
-| Onboarding WHOOP card | Rendered as a disabled/grayed placeholder in S5; S6 activates it |
-| Token refresh threshold | 5-minute expiry buffer (refresh if `expiresAt - now < 5 min`) |
+| `integration` table | `id`, `userId`, `category` (NOT NULL, no default), `provider`, `accessToken`, `refreshToken` (nullable), `expiresAt`, `scope` (nullable), `status` (default `'active'`), `createdAt`, `updatedAt`; unique on `(userId, provider)`. WHOOP rows: `provider = 'whoop'`, `category = 'health'`. |
+| `IntegrationRow` type | Hand-written type in `modules/calendar/calendarRepository.ts` (`refreshToken` and `scope` nullable). Shared across providers — import it, do not duplicate. |
+| State cookie helper | `app/api/integrations/google-calendar/stateToken.ts` exports `signState(userId)` / `verifyState(cookie)` (cookie-name-agnostic) and `STATE_COOKIE = 'gcal_oauth_state'`. WHOOP reuses `signState`/`verifyState` with its own cookie name `whoop_oauth_state`. |
+| `getConnectionStatus` shape | `'not_connected' \| 'needs_reconnect' \| 'connected'`. Calendar's is re-exported bare from `modules/index.ts`, so WHOOP's is named `getWhoopConnectionStatus` to avoid a barrel collision. |
+| Provider filtering | Calendar's repo filters every query on `provider = 'google_calendar'`. WHOOP's repo filters on `provider = 'whoop'` — a user may hold both rows. |
+| `OAuthError` | Refresh/auth failures throw `OAuthError` (in `shared/capabilities/calendar.ts`, re-exported from `infrastructure/calendar/googleCalendar.ts`) with a `code` (e.g. `'invalid_grant'`); service and report page catch on it. WHOOP throws the same `OAuthError` so error handling stays uniform — see Risks for the unverified WHOOP failure shape. |
+| `/onboarding` RSC page | `app/onboarding/page.tsx` passes `calendarStatus` + `selections` to `<OnboardingPage>`; S6 adds `whoopStatus`. |
+| Onboarding WHOOP card | Disabled/grayed placeholder (`opacity-50`, disabled button); S6 activates it. |
+| Singleton split | Both repo and client split the class from its constructed instance: `calendarRepository.ts` + `calendarRepository.singleton.ts` (`postgresCalendarRepository`); `googleCalendar.ts` + `googleCalendarClient.ts` (`googleCalendarClient`), re-exported from `infrastructure/index.ts`. WHOOP mirrors both splits. |
+| Token refresh threshold | 5-minute expiry buffer (`REFRESH_BUFFER_MS` in `calendarService.ts`). |
 
 ---
 
@@ -72,24 +74,29 @@ S5 before implementing U3 (the callback stores tokens) and U5 (onboarding page u
   `WhoopCycle`, `WhoopSleep`, `WhoopRecovery`, `WhoopPage<T>` (paginated response
   wrapper), and `WhoopRawData` (joined result: cycles array with matched sleep and
   recovery records keyed by `cycle_id`).
-- **R3** — `shared/capabilities/health.ts` defines `HealthCapability`: `fetchRawData(tokens:
-  HealthTokens, window: DateWindow) → Promise<WhoopRawData>` and `refreshTokens(refreshToken:
-  string) → Promise<HealthTokens>`. Follows the same structural pattern as `CalendarCapability`
-  (S5 `shared/capabilities/calendar.ts`). The capability does not auto-refresh tokens — the
-  service layer owns that decision.
+- **R3** — `shared/capabilities/health.ts` defines `HealthCapability`: `exchangeCode(code:
+  string, redirectUri: string) → Promise<HealthTokens>`, `fetchRawData(tokens: HealthTokens,
+  window: DateWindow) → Promise<WhoopRawData>`, and `refreshTokens(refreshToken: string) →
+  Promise<HealthTokens>` — mirroring `CalendarCapability` (S5 `shared/capabilities/calendar.ts`),
+  whose `exchangeCode` the callback route calls via the client singleton. The capability does
+  not auto-refresh tokens — the service layer owns that decision.
 - **R4** — `infrastructure/whoop/whoopClient.ts` implements `HealthCapability` using native
   `fetch` only. All token requests — both the initial code exchange and every refresh —
   use `URLSearchParams` body with `Content-Type: application/x-www-form-urlencoded` (spike
   finding #1: JSON does not reliably work). `fetchRawData` paginates all three endpoints via
   `next_token` loop (cap 50 pages) and joins results on `cycle_id`.
-- **R5** — `modules/whoop/whoopService.ts` exports: `getConnectionStatus(userId, repo) →
-  'not_connected' | 'needs_reconnect' | 'connected'`; `fetchRawDataForWindow(userId, window,
-  repo, client, logger)` — loads tokens, refreshes if near expiry using compare-and-swap
+- **R5** — `modules/whoop/whoopService.ts` exports: `getWhoopConnectionStatus(userId, repo) →
+  'not_connected' | 'needs_reconnect' | 'connected'` (distinct name — `getConnectionStatus` is
+  already exported bare from the `modules/index.ts` barrel by calendar); `fetchRawDataForWindow(userId,
+  window, repo, client, logger)` — loads tokens, refreshes if near expiry using compare-and-swap
   `updateTokens` (see KTD3), calls `client.fetchRawData`, on any auth failure marks
   `needs_reconnect` and rethrows, on success logs `logger.info('whoop data retrieved', {
-  cycleCount, sleepCount, recoveryCount })`.
-- **R6** — No new DB migration in S6. S5's `integration` table schema covers all WHOOP
-  token fields. WHOOP rows use `provider = 'whoop'`.
+  cycleCount, sleepCount, recoveryCount })`; `saveWhoopTokens(userId, tokens, scope, repo)` —
+  the callback's save path, calls `repo.saveIntegration(userId, tokens, scope, 'health')`
+  (mirrors S5's `saveCalendarTokens`).
+- **R6** — No new DB migration in S6. S5's `integration` table covers all WHOOP token fields.
+  WHOOP rows use `provider = 'whoop'`, `category = 'health'` (the `category` column is `NOT NULL`
+  with no default, so it is supplied on insert).
 - **R7** — `app/api/integrations/whoop/connect/route.ts` (GET): requires session; signs a
   CSRF state cookie (same HMAC-SHA256 pattern as S5 Calendar connect); builds the WHOOP
   authorization URL with scopes `offline read:profile read:cycles read:sleep read:recovery`
@@ -258,14 +265,16 @@ shared/
 
 infrastructure/
   whoop/
-    whoopClient.ts               # WhoopClient (HealthCapability implementation)
+    whoopClient.ts               # WhoopClient class (HealthCapability implementation)
+    whoopClient.singleton.ts     # constructed whoopClient instance
   db/
-    whoopRepository.ts           # PostgresWhoopRepository
+    whoopRepository.ts           # PostgresWhoopRepository class
+    whoopRepository.singleton.ts # postgresWhoopRepository instance
 
 modules/
   whoop/
     whoopRepository.ts           # WhoopRepository interface
-    whoopService.ts              # service functions
+    whoopService.ts              # getWhoopConnectionStatus, fetchRawDataForWindow, saveWhoopTokens
 
 app/
   api/
@@ -377,9 +386,10 @@ orchestrates token refresh and capability invocation.
 **Files:**
 - `shared/capabilities/health.ts` — `HealthCapability` interface + `HealthTokens` type
 - `modules/whoop/whoopRepository.ts` — `WhoopRepository` interface
-- `infrastructure/db/whoopRepository.ts` — `PostgresWhoopRepository`
+- `infrastructure/db/whoopRepository.ts` — `PostgresWhoopRepository` class
+- `infrastructure/db/whoopRepository.singleton.ts` — `postgresWhoopRepository` instance
 - `modules/whoop/whoopService.ts` — service functions
-- `modules/index.ts` — re-export `whoopService`
+- `modules/index.ts` — re-export `getWhoopConnectionStatus`, `fetchRawDataForWindow`, `saveWhoopTokens`
 - `shared/index.ts` — re-export `HealthCapability`
 - `__tests__/whoopService.test.ts` — service tests with stubs
 
@@ -392,12 +402,14 @@ orchestrates token refresh and capability invocation.
   - `refreshTokens(refreshToken: string): Promise<HealthTokens>`
 
 `WhoopRepository` interface (`modules/whoop/whoopRepository.ts`):
-- `getIntegration(userId: string): Promise<IntegrationRow | null>` — `IntegrationRow` is
-  the Drizzle-inferred type from the `integration` table in `infrastructure/db/schema.ts`,
-  shared with S5's `CalendarRepository`. Import from `infrastructure/db/schema.ts` or a
-  shared type alias — do not duplicate.
-- `saveIntegration(userId: string, tokens: HealthTokens, scope: string): Promise<void>` —
-  upserts on `(userId, provider = 'whoop')` using Drizzle's `onConflictDoUpdate`
+- `getIntegration(userId: string): Promise<IntegrationRow | null>` — `IntegrationRow` is the
+  shared type in `modules/calendar/calendarRepository.ts` (`refreshToken`/`scope` nullable);
+  import it, do not duplicate. The Postgres impl filters every query on `provider = 'whoop'`,
+  since a user may hold both a calendar and a whoop row.
+- `saveIntegration(userId: string, tokens: HealthTokens, scope: string, category: string): Promise<void>` —
+  `category` satisfies the `NOT NULL` column; callers pass `'health'`. Upserts on
+  `(userId, provider = 'whoop')` via Drizzle's `onConflictDoUpdate`, mirroring S5's
+  `COALESCE(EXCLUDED."refreshToken", ...)` guard so a refresh-token-less re-auth doesn't null it out.
 - `markNeedsReconnect(userId: string): Promise<void>` — sets `status = 'needs_reconnect'`
   for the user's `whoop` row
 - `updateTokens(userId: string, currentRefreshToken: string, newTokens: HealthTokens): Promise<boolean>` —
@@ -411,7 +423,7 @@ for WHOOP's rotating token requirement.
 `whoopService.ts` (pure functions; dependencies injected as explicit parameters — see
 architecture-context.md Wiring):
 
-`getConnectionStatus(userId, repo)`:
+`getWhoopConnectionStatus(userId, repo)`:
 - `null` row → `'not_connected'`
 - `status === 'needs_reconnect'` → `'needs_reconnect'`
 - `status === 'active'` → `'connected'`
@@ -498,11 +510,18 @@ the production HTTPS equivalent) to authorized redirect URIs in the WHOOP Develo
 Dashboard before end-to-end testing. Spike finding #2 confirmed `http://localhost`
 redirect URIs are accepted by WHOOP.
 
-**State cookie helper:** S5 inlines the HMAC sign/verify logic in its Calendar routes.
-Rather than duplicating it in the WHOOP routes, extract a shared `createStateCookie` /
-`verifyStateCookie` helper (e.g., `infrastructure/oauth/stateCookie.ts`) and have both
-Calendar and WHOOP routes import it. If S5 already extracted this, conform to its
-location; if not, this is the right moment — two call sites is the extraction threshold.
+**State cookie helper:** Reuse `signState`/`verifyState` from
+`app/api/integrations/google-calendar/stateToken.ts` (they sign/verify only the `{ userId, exp }`
+payload — cookie-name-agnostic). Declare a local `WHOOP_STATE_COOKIE = 'whoop_oauth_state'` in
+the WHOOP routes. Do not re-implement the HMAC logic. (If preferred, the helper can first be
+relocated to a provider-neutral module with a cookie-name parameter and both routes updated, but
+direct reuse is sufficient.)
+
+**Callback CSRF + session checks** (mirror the calendar callback): direct
+`searchParams.get('state') === stateCookie` equality check (403 on mismatch) in addition to
+`verifyState`; `session_lost` redirect (`/onboarding?error=session_lost`) when the cookie is
+absent; re-fetch the session via `authCapability.getSession` and redirect to `/sign-in` if
+`session.user.id !== userId`.
 
 **README vs. S5 HTTP method note:** The `README.md` API table lists `POST` for the
 connect route; S5 implements it as `GET`. S6 follows S5's actual implementation (GET) for
@@ -576,8 +595,9 @@ rules.
 4. Return `{ cycles: scoredCycles, sleeps: matchedSleeps, recoveries: matchedRecoveries }`.
    Cycles carry `start`, `end`, `timezone_offset` raw — S7 does the bucketing (KTD6).
 
-`whoopClient` singleton: constructed in `infrastructure/index.ts` with `clientId` and
-`clientSecret` from `env`; exported as `whoopClient`.
+`whoopClient` singleton: constructed in `infrastructure/whoop/whoopClient.singleton.ts` (with
+`clientId`/`clientSecret` from `env` and the `logger`), then re-exported from
+`infrastructure/index.ts` — mirroring S5's `googleCalendarClient.ts`.
 
 **Patterns to follow:** `infrastructure/calendar/googleCalendar.ts` — native fetch
 pattern, pagination, structured error throws; `context/spike/whoop/whoop-spike.ts` —
@@ -614,18 +634,20 @@ U4 (integration is retrievable for status)
 
 **Files:**
 - `app/onboarding/page.tsx` — fetch WHOOP status alongside Calendar status
-- `frontend/onboarding/OnboardingPage.tsx` — activate WHOOP card; update CTA + tier hint
-- `app/report/page.tsx` — update access gate for WHOOP-only path
+- `frontend/onboarding/OnboardingPage.tsx` — activate WHOOP card; update CTA + tier hint;
+  rename the `connectionStatus` prop → `calendarStatus` and add `whoopStatus`
+- `app/report/page.tsx` — update access gate and branch data orchestration (see Approach)
 - `modules/report/reportAccess.ts` — pure `resolveReportAccess` function extracted from
   the gate logic (see Approach)
 - `__tests__/reportAccess.test.ts` — unit tests for the gate decision function
+- `__tests__/reportPageGate.test.ts` — extend for two-status checks + WHOOP fetch wiring
 
 **Approach:**
 
 **`app/onboarding/page.tsx`:**
-Add `whoopService.getConnectionStatus(userId, postgresWhoopRepository)` fetched in
-parallel with the existing Calendar status fetch (`Promise.all`). Pass `whoopStatus` as
-a new prop to `<OnboardingPage>`.
+Add `getWhoopConnectionStatus(userId, postgresWhoopRepository)` fetched in parallel with the
+Calendar status fetch (`Promise.all`). Pass `calendarStatus`, `selections`, and `whoopStatus`
+to `<OnboardingPage>` (renaming the existing `connectionStatus` prop to `calendarStatus`).
 
 **`frontend/onboarding/OnboardingPage.tsx` — WHOOP card states (wireframe Screen 02):**
 
@@ -658,9 +680,25 @@ export function resolveReportAccess(
 ): 'onboarding' | 'connect-calendar' | 'render'
 ```
 
-The page calls `resolveReportAccess` and switches on the result. The function is a pure
-input→output with no async, no redirects — fully unit-testable. Check how S5 handles its
-own gate test; if it is untested inline, this extraction improves on the pattern.
+The page calls `resolveReportAccess` and switches on the result — a pure input→output function,
+no async, no redirects, fully unit-testable.
+
+**The page's data orchestration branches per active provider.** `fetchEventsForWindow` throws
+`NoSelectionsError`/`IntegrationNotFoundError` without a calendar integration or selections, so
+the calendar fetch must not run on the WHOOP-only path. After `resolveReportAccess` returns
+`'render'`:
+- Calendar active (`connected` + has selections) → `fetchEventsForWindow(...)`.
+- WHOOP active (`connected`) → `fetchRawDataForWindow(userId, window, postgresWhoopRepository,
+  whoopClient, logger)`.
+- Both active → fetch both, each guarded by its own active check.
+Fetch a provider only when it is the active path. The report still renders the fixture in S6
+regardless of which data was retrieved. The `OAuthError` (`invalid_grant`) → `redirect('/onboarding')`
+handling stays for whichever fetch runs.
+
+The page makes two status checks (calendar `getConnectionStatus`, WHOOP `getWhoopConnectionStatus`)
+and wires in `postgresWhoopRepository`, `whoopClient`, and `fetchRawDataForWindow` — the
+`reportPageGate.test.ts` mocks (`@/infrastructure`, `@/modules`) cover all of these alongside the
+new `reportAccess.test.ts` for the pure decision function.
 
 Decision table (`ConnectionStatus = 'not_connected' | 'needs_reconnect' | 'connected'`):
 
@@ -711,10 +749,6 @@ click CTA → `/report` renders fixture (not redirected). Re-test with both conn
 
 ## Risks and Dependencies
 
-- **S5 must ship before S6 starts.** `integration` table schema, `/onboarding` page
-  structure, CSRF cookie pattern, `IntegrationRow` type, and `getConnectionStatus` shape
-  all come from S5. Starting S6 before S5 is complete risks schema conflicts and pattern
-  drift.
 - **WHOOP Developer Dashboard redirect URI registration.** Register
   `http://localhost:3000/api/integrations/whoop/callback` (dev) and the production HTTPS
   equivalent before end-to-end testing. This is a 2-minute external config step; missing
