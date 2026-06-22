@@ -18,9 +18,9 @@ export type CalendarDaySignal = {
 // Keyword→category map evaluated in order; first match wins.
 const CATEGORY_KEYWORDS: Array<[string, string[]]> = [
   ['Work', ['work', 'meeting', 'standup', 'stand-up', 'sync', 'interview', 'review', 'planning', 'sprint', 'office', 'presentation', '1:1', '1-1', 'onboarding', 'retrospective', 'retro', 'all hands', 'all-hands', 'okr', 'kickoff', 'demo', 'debrief', 'alignment', 'check-in', 'check in']],
-  ['Exercise', ['gym', 'workout', 'run', 'bike', 'swim', 'yoga', 'hike', 'pilates', 'crossfit', 'training', 'lift', 'cycling']],
+  ['Exercise', ['gym', 'workout', 'run', 'bike', 'swim', 'yoga', 'hike', 'pilates', 'arial hoop', 'crossfit', 'training', 'lift', 'cycling']],
   ['Family', ['family', 'kids', 'school', 'parent', 'birthday', 'wedding']],
-  ['Social', ['lunch', 'coffee', 'happy hour', 'dinner', 'party', 'drinks', 'friend']],
+  ['Social', ['breakfast', 'brunch', 'lunch', 'coffee', 'happy hour', 'dinner', 'party', 'drinks', 'friend']],
   ['Learning', ['course', 'class', 'study', 'read', 'book club', 'conference', 'workshop', 'lecture']],
   ['Travel', ['flight', 'travel', 'trip', 'hotel', 'airport', 'train']],
   ['Rest', ['rest', 'relax', 'day off', 'vacation', 'holiday', 'pto', 'nap']],
