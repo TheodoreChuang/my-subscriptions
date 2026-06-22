@@ -1,8 +1,7 @@
 import { headers } from 'next/headers'
 import { authCapability } from '@/infrastructure/auth'
-import { logger } from '@/infrastructure/logger';
+import { logger, googleCalendarClient, postgresCalendarRepository, postgresWhoopRepository, whoopClient } from '@/infrastructure';
 import { getReport } from '@/modules';
-import { reportSchema } from '@/shared/schemas/report';
 
 export async function GET() {
   const session = await authCapability.getSession(await headers())
@@ -11,8 +10,13 @@ export async function GET() {
   }
 
   try {
-    const report = await getReport(logger);
-    reportSchema.parse(report);
+    const report = await getReport(session.user.id, {
+      calendarRepo: postgresCalendarRepository,
+      calendarClient: googleCalendarClient,
+      whoopRepo: postgresWhoopRepository,
+      whoopClient,
+      logger,
+    });
     return Response.json(report);
   } catch (err) {
     logger.error('GET /api/report failed', { err });

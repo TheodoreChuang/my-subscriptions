@@ -15,8 +15,6 @@ vi.mock('@/infrastructure/auth', () => ({
 
 const mockGetConnectionStatus = vi.fn()
 const mockGetWhoopConnectionStatus = vi.fn()
-const mockFetchEventsForWindow = vi.fn()
-const mockFetchRawDataForWindow = vi.fn()
 const mockGetReport = vi.fn()
 const mockGetSelections = vi.fn()
 
@@ -46,8 +44,6 @@ vi.mock('@/modules', async (importOriginal) => {
     ...original,
     getConnectionStatus: mockGetConnectionStatus,
     getWhoopConnectionStatus: mockGetWhoopConnectionStatus,
-    fetchEventsForWindow: mockFetchEventsForWindow,
-    fetchRawDataForWindow: mockFetchRawDataForWindow,
     getReport: mockGetReport,
   }
 })
@@ -72,8 +68,6 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockRequireSession.mockResolvedValue(validSession)
   mockGetReport.mockResolvedValue({ findings: [], coverageDays: 30, daySummaries: [] })
-  mockFetchEventsForWindow.mockResolvedValue([])
-  mockFetchRawDataForWindow.mockResolvedValue({ cycles: [], sleeps: [], recoveries: [] })
   mockGetSelections.mockResolvedValue(noSelections)
   mockGetConnectionStatus.mockResolvedValue('not_connected')
   mockGetWhoopConnectionStatus.mockResolvedValue('not_connected')
@@ -101,42 +95,57 @@ describe('report page access gate', () => {
     expect(redirect).toHaveBeenCalledWith('/connect/calendar')
   })
 
-  it('renders report when calendar connected with selections, WHOOP not_connected (regression guard)', async () => {
+  it('renders report when calendar connected with selections, WHOOP not_connected', async () => {
     mockGetConnectionStatus.mockResolvedValue('connected')
     mockGetSelections.mockResolvedValue(withSelections)
     const { default: ReportRoute } = await import('@/app/report/page')
     await ReportRoute()
-    expect(mockFetchEventsForWindow).toHaveBeenCalled()
-    expect(mockGetReport).toHaveBeenCalled()
+    expect(mockGetReport).toHaveBeenCalledWith('u1', expect.any(Object))
   })
 
   it('renders report when WHOOP connected, calendar not_connected (WHOOP-only path)', async () => {
     mockGetWhoopConnectionStatus.mockResolvedValue('connected')
     const { default: ReportRoute } = await import('@/app/report/page')
     await ReportRoute()
-    expect(mockFetchRawDataForWindow).toHaveBeenCalled()
-    expect(mockFetchEventsForWindow).not.toHaveBeenCalled()
     expect(mockGetReport).toHaveBeenCalled()
     expect(redirect).not.toHaveBeenCalled()
   })
 
-  it('fetches both when both connected', async () => {
+  it('getReport called with correct userId', async () => {
+    mockGetConnectionStatus.mockResolvedValue('connected')
+    mockGetSelections.mockResolvedValue(withSelections)
+    const { default: ReportRoute } = await import('@/app/report/page')
+    await ReportRoute()
+    expect(mockGetReport).toHaveBeenCalledWith('u1', expect.any(Object))
+  })
+
+  it('redirects to /onboarding when getReport throws OAuthError invalid_grant', async () => {
+    const { OAuthError } = await import('@/infrastructure/calendar/googleCalendar')
+    mockGetConnectionStatus.mockResolvedValue('connected')
+    mockGetSelections.mockResolvedValue(withSelections)
+    mockGetReport.mockRejectedValue(new OAuthError('rejected', 'invalid_grant'))
+    const { default: ReportRoute } = await import('@/app/report/page')
+    await expect(ReportRoute()).rejects.toThrow('NEXT_REDIRECT:/onboarding')
+    expect(redirect).toHaveBeenCalledWith('/onboarding')
+  })
+
+  it('redirects to /onboarding when getReport throws IntegrationNotFoundError', async () => {
+    mockGetWhoopConnectionStatus.mockResolvedValue('connected')
+    // Import the real class via the whoop module
+    const { IntegrationNotFoundError } = await import('@/modules/whoop/whoopService')
+    mockGetReport.mockRejectedValue(new IntegrationNotFoundError())
+    const { default: ReportRoute } = await import('@/app/report/page')
+    await expect(ReportRoute()).rejects.toThrow('NEXT_REDIRECT:/onboarding')
+    expect(redirect).toHaveBeenCalledWith('/onboarding')
+  })
+
+  it('fetchEventsForWindow and fetchRawDataForWindow are NOT called directly from the page', async () => {
     mockGetConnectionStatus.mockResolvedValue('connected')
     mockGetSelections.mockResolvedValue(withSelections)
     mockGetWhoopConnectionStatus.mockResolvedValue('connected')
     const { default: ReportRoute } = await import('@/app/report/page')
     await ReportRoute()
-    expect(mockFetchEventsForWindow).toHaveBeenCalled()
-    expect(mockFetchRawDataForWindow).toHaveBeenCalled()
-  })
-
-  it('redirects to /onboarding when OAuthError invalid_grant is thrown during fetch', async () => {
-    const { OAuthError } = await import('@/infrastructure/calendar/googleCalendar')
-    mockGetConnectionStatus.mockResolvedValue('connected')
-    mockGetSelections.mockResolvedValue(withSelections)
-    mockFetchEventsForWindow.mockRejectedValue(new OAuthError('rejected', 'invalid_grant'))
-    const { default: ReportRoute } = await import('@/app/report/page')
-    await expect(ReportRoute()).rejects.toThrow('NEXT_REDIRECT:/onboarding')
-    expect(redirect).toHaveBeenCalledWith('/onboarding')
+    // These calls now live inside getReport — only getReport is called on the page
+    expect(mockGetReport).toHaveBeenCalled()
   })
 })
