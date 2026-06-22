@@ -316,6 +316,7 @@ without passing that gate.
 
 ## (Optional) Screenshots or a short demo video
 
+Demo video provided on request.
 
 ## Future Enhancements
 
