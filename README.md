@@ -41,7 +41,7 @@ so they are a cache we regenerate, never a record we patch.
 
 | Entity | Treatment | Why |
 |---|---|---|
-| **User** | Persisted — source of record | The single connected identity, **created by Better Auth at sign-in** (Google social login) — there is no app-owned create-user route. Authoritative; can't be recomputed. Holds the canonical IANA `timezone` — captured from the browser at sign-in (`Intl`), Google primary-calendar zone as fallback — the single spine for day-bucketing and the rolling-window math (report generation runs server-side with no browser, so this must be persisted). |
+| **User** | Persisted — source of record | The single connected identity, **created by Better Auth at sign-in** (Google social login) — there is no app-owned create-user route. Authoritative; can't be recomputed. |
 | **Integration** | Persisted — source of record | One linked service, modeled by **category** (`calendar` \| `health`) + provider id, holding OAuth tokens, refresh expiry, and the sync cursor. A category-tagged row, not a provider registry. |
 | **CalendarSelection** | Persisted — source of record | One **owned** calendar the user has included (primary pre-selected). **Presence = included** — we persist only the user's choice, never a mirror of every calendar; the available list is fetched live from the provider, so there is no `selected` flag. `name` is a cached label for display. Belongs to a calendar Integration. |
 | **Report** | Persisted — derived snapshot | The output of one generation run: the fused daily timeline + computed metrics/correlations that back its charts, plus the AI Insights. Carries a `status` (`pending` \| `ready` \| `error`) and a `generatedFrom` fingerprint (sources + window + `generatedAt`). **Latest-only for the MVP; regenerated wholesale, never patched.** |
@@ -62,7 +62,6 @@ erDiagram
         uuid id
         string name
         string email
-        string timezone
     }
 
     Integration {
@@ -204,8 +203,68 @@ IntegrationService --> ReportService
 
 ## Brief on your AI implementation
 
+AI is the final step in a deterministic pipeline — it interprets, it does not
+calculate. The pipeline runs synchronously on every report generation:
+
+```
+fetch providers → normalize → DaySummary[] → compute metrics → evidence packet → AI → validate → store
+```
+
+The model receives a compact **evidence packet**: pre-computed metrics (activity
+allocation, recovery averages, activity↔recovery deltas with sample size `n` and
+a confidence signal), a handful of named exemplar days (best/worst), and candidate
+signals the deterministic layer already identified. It never sees raw events or
+health cycles.
+
+Five techniques push the AI toward honest interpretation under the inherent
+small-sample uncertainty (~30 days, n ≈ 26):
+
+1. **Competing hypotheses** — for each notable delta, generate 2–3 candidate
+   explanations including at least one confound or reverse-causation account.
+2. **Skeptical self-critique** — inline critic pass: each claim must survive "is
+   this distinguishable from noise at this n?" Claims that don't are downgraded or cut.
+3. **Falsifiable experiments** — every recommendation is framed as a cheap natural
+   experiment with an expected signal and a kill condition.
+4. **License to find nothing** — the prompt explicitly permits the conclusion
+   "nothing here is distinguishable from noise yet," rewarding restraint over
+   manufactured insight.
+5. **Calibrated confidence** — each finding carries a confidence level
+   (`high` / `medium` / `low`) and a "what would change my mind" line.
+
+AI output is validated against a narrow Zod sub-schema before being merged with
+the deterministic fields and persisted — it never becomes the system of record
+without passing that gate.
 
 ## Any limitations or next steps
+
+**Current limitations:**
+
+- **UTC timezone only.** Day bucketing uses UTC throughout. A user whose midnight
+  falls far from UTC will occasionally see a cycle or event on the "wrong" calendar
+  date. Low impact at 30-day granularity but not correct.
+- **Synchronous pipeline.** Retrieve + normalize + AI runs in one request. Fine for
+  an MVP; latency could exceed Vercel's function timeout with slow provider
+  responses or large data windows — not yet measured.
+- **Rule-based categorization.** Calendar events are categorized by keyword
+  matching on the title. Miscategorization is common and there is no user
+  correction mechanism.
+- **Small sample by design.** The 30-day rolling window means `n` is genuinely
+  small (~26 usable days). The AI is instructed to reason honestly about this, but
+  findings will often be low confidence.
+- **Single user, no report history.** One report per user, overwritten on every
+  generation. No versioning, no trend across reports.
+- **Google OAuth unverified.** Until the app passes Google's OAuth verification,
+  non-test users see an "unverified app" warning and refresh tokens expire after
+  7 days.
+
+**Logical next steps (roughly ordered):**
+
+- Per-user timezone (store IANA zone at sign-in, use for all date bucketing)
+- User-correctable event categorization
+- Report history and week-over-week trend view
+- Async pipeline with a loading/polling pattern to remove the timeout risk
+- Additional providers (Strava, Oura, GitHub, Spotify)
+- Google OAuth app verification to remove the 7-day re-consent loop for real users
 
 
 ## (Optional) Screenshots or a short demo video
