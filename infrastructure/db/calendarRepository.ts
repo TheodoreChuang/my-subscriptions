@@ -98,6 +98,13 @@ export class PostgresCalendarRepository implements CalendarRepository {
     }))
   }
 
+  async touchIntegration(userId: string): Promise<void> {
+    await db
+      .update(integration)
+      .set({ updatedAt: new Date() })
+      .where(and(eq(integration.userId, userId), eq(integration.provider, 'google_calendar')))
+  }
+
   async saveSelections(
     integrationId: string,
     selections: Array<{ externalCalendarId: string; name: string }>,

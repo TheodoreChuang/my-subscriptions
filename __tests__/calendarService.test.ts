@@ -41,6 +41,7 @@ function makeRepo(overrides: Partial<CalendarRepository> = {}): CalendarReposito
     getSelections: vi.fn().mockResolvedValue([]),
     getSelectionsByIntegrationId: vi.fn().mockResolvedValue([]),
     saveSelections: vi.fn().mockResolvedValue(undefined),
+    touchIntegration: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
 }
@@ -234,5 +235,19 @@ describe('updateSelections', () => {
     const sels = [{ externalCalendarId: 'cal1', name: 'My Cal' }]
     await updateSelections('u1', sels, repo)
     expect(repo.saveSelections).toHaveBeenCalledWith('int1', sels)
+  })
+
+  it('calls repo.touchIntegration once after successful saveSelections', async () => {
+    const repo = makeRepo()
+    const sels = [{ externalCalendarId: 'cal1', name: 'My Cal' }]
+    await updateSelections('u1', sels, repo)
+    expect(repo.touchIntegration).toHaveBeenCalledTimes(1)
+    expect(repo.touchIntegration).toHaveBeenCalledWith('u1')
+  })
+
+  it('throws IntegrationNotFoundError and does NOT call touchIntegration when no integration exists', async () => {
+    const repo = makeRepo({ getIntegration: vi.fn().mockResolvedValue(null) })
+    await expect(updateSelections('u1', [], repo)).rejects.toBeInstanceOf(IntegrationNotFoundError)
+    expect(repo.touchIntegration).not.toHaveBeenCalled()
   })
 })

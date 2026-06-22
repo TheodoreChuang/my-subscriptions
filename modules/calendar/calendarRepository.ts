@@ -30,4 +30,5 @@ export interface CalendarRepository {
     integrationId: string,
     selections: Array<{ externalCalendarId: string; name: string }>,
   ): Promise<void>
+  touchIntegration(userId: string): Promise<void>
 }

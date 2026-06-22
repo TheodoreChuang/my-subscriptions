@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
 import { getReport } from '@/modules/report/reportService'
 import { reportSchema, aiOutputSchema } from '@/shared/schemas/report'
+import type { StoredReport } from '@/modules/report/reportRepository'
 import type { z } from 'zod'
 import type { CalendarRepository, IntegrationRow, CalendarSelectionRow } from '@/modules/calendar/calendarRepository'
 import type { CalendarCapability, RawCalendarEvent } from '@/shared/capabilities/calendar'
@@ -44,6 +45,7 @@ function makeCalRepo(overrides: Partial<CalendarRepository> = {}): CalendarRepos
     getSelections: vi.fn().mockResolvedValue(withSelections),
     getSelectionsByIntegrationId: vi.fn().mockResolvedValue(withSelections),
     saveSelections: vi.fn().mockResolvedValue(undefined),
+    touchIntegration: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   }
 }
@@ -321,5 +323,109 @@ describe('getReport', () => {
     for (const wh of r.weekHighlights) {
       expect(typeof wh.summary).toBe('string')
     }
+  })
+})
+
+// ─── Read-through getReport ────────────────────────────────────────────────────
+
+const TODAY_STR = new Date().toISOString().slice(0, 10)
+const YESTERDAY_STR = (() => {
+  const d = new Date()
+  d.setUTCDate(d.getUTCDate() - 1)
+  return d.toISOString().slice(0, 10)
+})()
+
+function makeStoredReport(windowEnd: string, snapshotAt: Date): StoredReport {
+  return {
+    report: reportSchema.parse({
+      window: { start: '2026-05-23', end: windowEnd, days: 30, label: 'May 23 – Jun 22' },
+      coverageDays: 0,
+      connectedSources: ['calendar'],
+      executiveSummary: 'Cached summary.',
+      weekHighlights: [],
+      daySummaries: [],
+      metrics: {},
+      findings: [],
+      generatedAt: new Date().toISOString(),
+    }),
+    integrationSnapshotAt: snapshotAt,
+  }
+}
+
+describe('getReport — read-through', () => {
+  const integrationAt = new Date('2026-06-01T00:00:00Z')
+
+  it('fast path: stored report is current → returns stored.report without calling aiClient', async () => {
+    const stored = makeStoredReport(TODAY_STR, integrationAt)
+    const aiClient = makeAIClient()
+    const reportRepo: ReportRepository = {
+      getReport: vi.fn().mockResolvedValue(stored),
+      saveReport: vi.fn().mockResolvedValue(undefined),
+    }
+    // Both integrations return updatedAt = integrationAt (not newer)
+    const calRepo = makeCalRepo({
+      getIntegration: vi.fn().mockResolvedValue(makeIntegration({ updatedAt: integrationAt })),
+    })
+    const whoopRepo = makeWhoopRepo({
+      getIntegration: vi.fn().mockResolvedValue(makeIntegration({ provider: 'whoop', updatedAt: integrationAt })),
+    })
+    const result = await getReport('u1', makeDeps({ aiClient, reportRepo, calendarRepo: calRepo, whoopRepo }))
+    expect(result).toEqual(stored.report)
+    expect(aiClient.generateObject).not.toHaveBeenCalled()
+  })
+
+  it('slow path: stored = null → generateReport is called (aiClient.generateObject called)', async () => {
+    const aiClient = makeAIClient()
+    const result = await getReport('u1', makeDeps({ aiClient }))
+    expect(aiClient.generateObject).toHaveBeenCalledTimes(1)
+    expect(() => reportSchema.parse(result)).not.toThrow()
+  })
+
+  it('slow path: window drift (stored window end is yesterday) → generateReport called', async () => {
+    const stored = makeStoredReport(YESTERDAY_STR, integrationAt)
+    const aiClient = makeAIClient()
+    const reportRepo: ReportRepository = {
+      getReport: vi.fn().mockResolvedValue(stored),
+      saveReport: vi.fn().mockResolvedValue(undefined),
+    }
+    await getReport('u1', makeDeps({ aiClient, reportRepo }))
+    expect(aiClient.generateObject).toHaveBeenCalledTimes(1)
+  })
+
+  it('slow path: integration changed (currentAt newer than stored snapshot) → generateReport called', async () => {
+    const olderSnapshot = new Date('2026-05-31T00:00:00Z')
+    const stored = makeStoredReport(TODAY_STR, olderSnapshot)
+    const newerIntegrationAt = new Date('2026-06-01T00:00:00Z')
+    const aiClient = makeAIClient()
+    const reportRepo: ReportRepository = {
+      getReport: vi.fn().mockResolvedValue(stored),
+      saveReport: vi.fn().mockResolvedValue(undefined),
+    }
+    const calRepo = makeCalRepo({
+      getIntegration: vi.fn().mockResolvedValue(makeIntegration({ updatedAt: newerIntegrationAt })),
+    })
+    const whoopRepo = makeWhoopRepo({ getIntegration: vi.fn().mockResolvedValue(null) })
+    await getReport('u1', makeDeps({ aiClient, reportRepo, calendarRepo: calRepo, whoopRepo }))
+    expect(aiClient.generateObject).toHaveBeenCalledTimes(1)
+  })
+
+  it('sequential calls with current report → aiClient.generateObject called exactly once', async () => {
+    const aiClient = makeAIClient()
+    // First call: no stored report → generates and saves
+    let capturedReport: StoredReport | null = null
+    const reportRepo: ReportRepository = {
+      getReport: vi.fn().mockImplementation(() => Promise.resolve(capturedReport)),
+      saveReport: vi.fn().mockImplementation(async (_userId, report, snapshotAt) => {
+        capturedReport = { report, integrationSnapshotAt: snapshotAt }
+      }),
+    }
+    const calRepo = makeCalRepo({
+      getIntegration: vi.fn().mockResolvedValue(makeIntegration({ updatedAt: new Date('2026-06-01T00:00:00Z') })),
+    })
+    const whoopRepo = makeWhoopRepo({ getIntegration: vi.fn().mockResolvedValue(null) })
+    await getReport('u1', makeDeps({ aiClient, reportRepo, calendarRepo: calRepo, whoopRepo }))
+    // Second call: stored report is current (window matches today, integration unchanged)
+    await getReport('u1', makeDeps({ aiClient, reportRepo, calendarRepo: calRepo, whoopRepo }))
+    expect(aiClient.generateObject).toHaveBeenCalledTimes(1)
   })
 })

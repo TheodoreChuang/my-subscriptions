@@ -17,6 +17,7 @@ const mockGetConnectionStatus = vi.fn()
 const mockGetWhoopConnectionStatus = vi.fn()
 const mockGetReport = vi.fn()
 const mockGetSelections = vi.fn()
+const mockGetReportPageStatus = vi.fn()
 
 vi.mock('@/infrastructure', () => ({
   googleCalendarClient: {},
@@ -44,11 +45,16 @@ vi.mock('@/modules', async (importOriginal) => {
     getConnectionStatus: mockGetConnectionStatus,
     getWhoopConnectionStatus: mockGetWhoopConnectionStatus,
     getReport: mockGetReport,
+    getReportPageStatus: mockGetReportPageStatus,
   }
 })
 
 vi.mock('@/app/report/ReportPage', () => ({
   ReportPage: vi.fn(() => null),
+}))
+
+vi.mock('@/app/report/components/AnalysisScreen', () => ({
+  AnalysisScreen: vi.fn(() => null),
 }))
 
 const { authCapability } = await import('@/infrastructure/auth')
@@ -67,6 +73,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   mockRequireSession.mockResolvedValue(validSession)
   mockGetReport.mockResolvedValue({ findings: [], coverageDays: 30, daySummaries: [] })
+  mockGetReportPageStatus.mockResolvedValue({ status: 'needs_generation', staleReport: null })
   mockGetSelections.mockResolvedValue(noSelections)
   mockGetConnectionStatus.mockResolvedValue('not_connected')
   mockGetWhoopConnectionStatus.mockResolvedValue('not_connected')
@@ -94,48 +101,29 @@ describe('report page access gate', () => {
     expect(redirect).toHaveBeenCalledWith('/connect/calendar')
   })
 
-  it('renders report when calendar connected with selections, WHOOP not_connected', async () => {
+  it('returns JSX (no redirect) when calendar connected with selections, WHOOP not_connected', async () => {
     mockGetConnectionStatus.mockResolvedValue('connected')
     mockGetSelections.mockResolvedValue(withSelections)
     const { default: ReportRoute } = await import('@/app/report/page')
-    await ReportRoute()
-    expect(mockGetReport).toHaveBeenCalledWith('u1', expect.any(Object))
-  })
-
-  it('renders report when WHOOP connected, calendar not_connected (WHOOP-only path)', async () => {
-    mockGetWhoopConnectionStatus.mockResolvedValue('connected')
-    const { default: ReportRoute } = await import('@/app/report/page')
-    await ReportRoute()
-    expect(mockGetReport).toHaveBeenCalled()
+    const result = await ReportRoute()
     expect(redirect).not.toHaveBeenCalled()
+    expect(result).toBeDefined()
   })
 
-  it('getReport called with correct userId', async () => {
+  it('returns JSX (no redirect) when WHOOP connected, calendar not_connected (WHOOP-only path)', async () => {
+    mockGetWhoopConnectionStatus.mockResolvedValue('connected')
+    const { default: ReportRoute } = await import('@/app/report/page')
+    const result = await ReportRoute()
+    expect(redirect).not.toHaveBeenCalled()
+    expect(result).toBeDefined()
+  })
+
+  it('fast status check called with correct userId', async () => {
     mockGetConnectionStatus.mockResolvedValue('connected')
     mockGetSelections.mockResolvedValue(withSelections)
     const { default: ReportRoute } = await import('@/app/report/page')
     await ReportRoute()
-    expect(mockGetReport).toHaveBeenCalledWith('u1', expect.any(Object))
-  })
-
-  it('redirects to /onboarding when getReport throws OAuthError invalid_grant', async () => {
-    const { OAuthError } = await import('@/shared/capabilities/calendar')
-    mockGetConnectionStatus.mockResolvedValue('connected')
-    mockGetSelections.mockResolvedValue(withSelections)
-    mockGetReport.mockRejectedValue(new OAuthError('rejected', 'invalid_grant'))
-    const { default: ReportRoute } = await import('@/app/report/page')
-    await expect(ReportRoute()).rejects.toThrow('NEXT_REDIRECT:/onboarding')
-    expect(redirect).toHaveBeenCalledWith('/onboarding')
-  })
-
-  it('redirects to /onboarding when getReport throws IntegrationNotFoundError', async () => {
-    mockGetWhoopConnectionStatus.mockResolvedValue('connected')
-    // Import the real class via the whoop module
-    const { IntegrationNotFoundError } = await import('@/modules/whoop/whoopService')
-    mockGetReport.mockRejectedValue(new IntegrationNotFoundError())
-    const { default: ReportRoute } = await import('@/app/report/page')
-    await expect(ReportRoute()).rejects.toThrow('NEXT_REDIRECT:/onboarding')
-    expect(redirect).toHaveBeenCalledWith('/onboarding')
+    expect(mockGetReportPageStatus).toHaveBeenCalledWith('u1', expect.any(Object))
   })
 
   it('fetchEventsForWindow and fetchRawDataForWindow are NOT called directly from the page', async () => {
@@ -144,7 +132,34 @@ describe('report page access gate', () => {
     mockGetWhoopConnectionStatus.mockResolvedValue('connected')
     const { default: ReportRoute } = await import('@/app/report/page')
     await ReportRoute()
-    // These calls now live inside getReport — only getReport is called on the page
-    expect(mockGetReport).toHaveBeenCalled()
+    // Pipeline calls are inside getReport (GenerateReportContent), not directly on the page
+    expect(redirect).not.toHaveBeenCalled()
+  })
+})
+
+// ─── GenerateReportContent error handling ─────────────────────────────────────
+// These test the streaming RSC that runs inside the Suspense boundary.
+
+describe('GenerateReportContent error handling', () => {
+  it('redirects to /onboarding when getReport throws OAuthError invalid_grant', async () => {
+    const { OAuthError } = await import('@/shared/capabilities/calendar')
+    mockGetReport.mockRejectedValue(new OAuthError('rejected', 'invalid_grant'))
+    const { GenerateReportContent } = await import('@/app/report/page')
+    await expect(GenerateReportContent({ userId: 'u1' })).rejects.toThrow('NEXT_REDIRECT:/onboarding')
+    expect(redirect).toHaveBeenCalledWith('/onboarding')
+  })
+
+  it('redirects to /onboarding when getReport throws IntegrationNotFoundError', async () => {
+    const { IntegrationNotFoundError } = await import('@/modules/whoop/whoopService')
+    mockGetReport.mockRejectedValue(new IntegrationNotFoundError())
+    const { GenerateReportContent } = await import('@/app/report/page')
+    await expect(GenerateReportContent({ userId: 'u1' })).rejects.toThrow('NEXT_REDIRECT:/onboarding')
+    expect(redirect).toHaveBeenCalledWith('/onboarding')
+  })
+
+  it('calls getReport with correct userId', async () => {
+    const { GenerateReportContent } = await import('@/app/report/page')
+    await GenerateReportContent({ userId: 'u1' })
+    expect(mockGetReport).toHaveBeenCalledWith('u1', expect.any(Object))
   })
 })

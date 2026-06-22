@@ -64,7 +64,7 @@ export function CalendarSelectionPage({
         setError((body as { error?: string }).error ?? 'Failed to save. Please try again.')
         return
       }
-      router.push('/report')
+      router.push('/onboarding')
     } catch {
       setError('Network error. Please try again.')
     } finally {

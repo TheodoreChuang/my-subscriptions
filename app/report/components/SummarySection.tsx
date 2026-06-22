@@ -32,6 +32,9 @@ export function SummarySection({ report }: { report: Report }) {
       <h1 id="summary-heading" className="text-3xl font-bold tracking-tight mb-3">
         Your month decoded.
       </h1>
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+        AI Summary
+      </p>
 
       <p className="text-muted-foreground leading-relaxed mb-6">
         {report.executiveSummary}

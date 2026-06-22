@@ -101,6 +101,7 @@ export async function updateSelections(
   const integration = await repo.getIntegration(userId)
   if (!integration) throw new IntegrationNotFoundError()
   await repo.saveSelections(integration.id, selections)
+  await repo.touchIntegration(userId)
 }
 
 export async function fetchEventsForWindow(
