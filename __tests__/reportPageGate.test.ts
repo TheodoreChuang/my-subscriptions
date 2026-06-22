@@ -26,16 +26,9 @@ vi.mock('@/infrastructure', () => ({
   logger: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
 }))
 
-vi.mock('@/infrastructure/calendar/googleCalendar', () => {
-  class OAuthError extends Error {
-    code: string
-    constructor(message: string, code: string) {
-      super(message)
-      this.name = 'OAuthError'
-      this.code = code
-    }
-  }
-  return { OAuthError }
+vi.mock('@/shared/capabilities/calendar', async (importOriginal) => {
+  const original = await importOriginal<typeof import('@/shared/capabilities/calendar')>()
+  return { ...original }
 })
 
 vi.mock('@/modules', async (importOriginal) => {
@@ -120,7 +113,7 @@ describe('report page access gate', () => {
   })
 
   it('redirects to /onboarding when getReport throws OAuthError invalid_grant', async () => {
-    const { OAuthError } = await import('@/infrastructure/calendar/googleCalendar')
+    const { OAuthError } = await import('@/shared/capabilities/calendar')
     mockGetConnectionStatus.mockResolvedValue('connected')
     mockGetSelections.mockResolvedValue(withSelections)
     mockGetReport.mockRejectedValue(new OAuthError('rejected', 'invalid_grant'))

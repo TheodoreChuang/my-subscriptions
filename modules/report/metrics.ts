@@ -88,9 +88,10 @@ export function computeMetrics(
 
       const n = withCat.length
       if (n < INSUFFICIENT_N) continue
+      if (withoutCat.length === 0) continue
 
       const avgWith = mean(withCat.map((d) => d.recovery as number))
-      const avgWithout = withoutCat.length > 0 ? mean(withoutCat.map((d) => d.recovery as number)) : 0
+      const avgWithout = mean(withoutCat.map((d) => d.recovery as number))
 
       const deltaPercent = avgWithout !== 0
         ? ((avgWith - avgWithout) / avgWithout) * 100

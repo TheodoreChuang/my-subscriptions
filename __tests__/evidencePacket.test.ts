@@ -59,10 +59,19 @@ describe('computeWeekStats', () => {
     expect(computeWeekStats(days)).toHaveLength(0)
   })
 
-  it('returns best === worst when all recovery scores are identical', () => {
+  it('returns empty array when only one week qualifies', () => {
     const days = Array.from({ length: 7 }, (_, i) =>
       makeDay(`2026-06-${String(i + 1).padStart(2, '0')}`, 70),
     )
+    expect(computeWeekStats(days)).toHaveLength(0)
+  })
+
+  it('returns best === worst when all recovery scores are identical across two weeks', () => {
+    // Week 23 (Jun 1–7) and Week 24 (Jun 8–14), all at recovery 70
+    const days = [
+      ...Array.from({ length: 4 }, (_, i) => makeDay(`2026-06-${String(i + 1).padStart(2, '0')}`, 70)),
+      ...Array.from({ length: 4 }, (_, i) => makeDay(`2026-06-${String(i + 8).padStart(2, '0')}`, 70)),
+    ]
     const stats = computeWeekStats(days)
     const best = stats.find((w) => w.label === 'Best week')
     const worst = stats.find((w) => w.label === 'Worst week')
@@ -71,12 +80,15 @@ describe('computeWeekStats', () => {
 
   it('dateRange includes first and last data day of the week', () => {
     const days = [
-      makeDay('2026-06-01', 70), // Monday
+      makeDay('2026-06-01', 70), // Monday — Week 23
       makeDay('2026-06-02', 75), // Tuesday
       makeDay('2026-06-03', 80), // Wednesday
+      makeDay('2026-06-08', 65), // Monday — Week 24
+      makeDay('2026-06-09', 60), // Tuesday
+      makeDay('2026-06-10', 70), // Wednesday
     ]
     const stats = computeWeekStats(days)
-    expect(stats).toHaveLength(2) // best and worst (same week)
+    expect(stats).toHaveLength(2)
     expect(stats[0].dateRange).toBeDefined()
     expect(typeof stats[0].dateRange).toBe('string')
   })

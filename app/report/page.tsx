@@ -5,7 +5,7 @@ import { googleCalendarClient, postgresCalendarRepository, postgresWhoopReposito
 import { getReport, getConnectionStatus, getWhoopConnectionStatus } from '@/modules'
 import { resolveReportAccess } from '@/modules/report/reportAccess'
 import { IntegrationNotFoundError } from '@/modules/whoop/whoopService'
-import { OAuthError } from '@/infrastructure/calendar/googleCalendar'
+import { OAuthError } from '@/shared/capabilities/calendar'
 import { ReportPage } from './ReportPage'
 
 export const dynamic = 'force-dynamic'

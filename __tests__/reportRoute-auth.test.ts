@@ -32,6 +32,11 @@ vi.mock('@/modules', async (importOriginal) => {
   }
 })
 
+vi.mock('@/shared/capabilities/calendar', async (importOriginal) => {
+  const original = await importOriginal<typeof import('@/shared/capabilities/calendar')>()
+  return { ...original }
+})
+
 const { authCapability } = await import('@/infrastructure/auth')
 const { GET } = await import('@/app/api/report/route')
 
@@ -77,5 +82,34 @@ describe('GET /api/report', () => {
     mockGetSession.mockResolvedValue(null)
     const res = await GET()
     expect(res.status).toBe(401)
+  })
+
+  it('returns 401 with auth_required when getReport throws OAuthError invalid_grant', async () => {
+    mockGetSession.mockResolvedValue(validSession)
+    const { OAuthError } = await import('@/shared/capabilities/calendar')
+    mockGetReport.mockRejectedValue(new OAuthError('rejected', 'invalid_grant'))
+    const res = await GET()
+    expect(res.status).toBe(401)
+    const body = await res.json()
+    expect(body).toEqual({ error: 'auth_required', provider: 'calendar' })
+  })
+
+  it('returns 401 with auth_required when getReport throws IntegrationNotFoundError', async () => {
+    mockGetSession.mockResolvedValue(validSession)
+    const { IntegrationNotFoundError } = await import('@/modules/whoop/whoopService')
+    mockGetReport.mockRejectedValue(new IntegrationNotFoundError())
+    const res = await GET()
+    expect(res.status).toBe(401)
+    const body = await res.json()
+    expect(body).toEqual({ error: 'auth_required', provider: 'health' })
+  })
+
+  it('returns 500 for unexpected errors', async () => {
+    mockGetSession.mockResolvedValue(validSession)
+    mockGetReport.mockRejectedValue(new Error('database exploded'))
+    const res = await GET()
+    expect(res.status).toBe(500)
+    const body = await res.json()
+    expect(body).toEqual({ error: 'Internal error' })
   })
 })

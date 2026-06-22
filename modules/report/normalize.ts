@@ -82,7 +82,7 @@ export function normalizeWhoopCycles(raw: WhoopRawData): WhoopDaySignal[] {
     if (sleep && sleep.score?.stage_summary) {
       const inBed = sleep.score.stage_summary.total_in_bed_time_milli ?? 0
       const awake = sleep.score.stage_summary.total_awake_time_milli ?? 0
-      sleepHours = (inBed - awake) / 3_600_000
+      sleepHours = Math.max(0, (inBed - awake) / 3_600_000)
     }
 
     const recoveryScore =

@@ -78,7 +78,7 @@ export function computeWeekStats(days: DaySummary[]): WeekStat[] {
       dateRange: formatDateRange(w.dates),
     }))
 
-  if (qualifyingWeeks.length === 0) return []
+  if (qualifyingWeeks.length < 2) return []
 
   const maxAvg = Math.max(...qualifyingWeeks.map((w) => w.avg))
   const minAvg = Math.min(...qualifyingWeeks.map((w) => w.avg))

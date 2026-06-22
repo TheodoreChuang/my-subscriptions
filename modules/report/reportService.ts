@@ -44,14 +44,14 @@ export async function getReport(userId: string, deps: ReportDeps): Promise<Repor
   ])
 
   const connectedSources: ConnectedSource[] = []
-  if (calendarStatus === 'connected') connectedSources.push('calendar')
   if (whoopStatus === 'connected') connectedSources.push('health')
 
-  // Determine if calendar has selections (required to fetch)
+  // Calendar is only an active source when OAuth'd AND calendars are selected
   let hasCalendarSelections = false
   if (calendarStatus === 'connected') {
     const selections = await calendarRepo.getSelections(userId)
     hasCalendarSelections = selections.length > 0
+    if (hasCalendarSelections) connectedSources.push('calendar')
   }
 
   // Parallel fetch — tier-gated
