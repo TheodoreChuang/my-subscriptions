@@ -22,6 +22,13 @@
       "when": 1782109290298,
       "tag": "0002_loving_gamora",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782112652005,
+      "tag": "0003_confused_juggernaut",
+      "breakpoints": true
     }
   ]
 }
