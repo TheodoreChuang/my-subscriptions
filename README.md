@@ -1,6 +1,8 @@
 # My Subscriptions
 
-## Setup steps (incl. .env.example)
+MySubscriptions connects a user's online services, normalizes their activity into a common timeline, and uses AI to surface insights.
+
+## Setup steps
 
 ### Google OAuth — one client for both sign-in and Calendar
 
@@ -20,6 +22,14 @@ Google OAuth client**. In a Google Cloud project:
    sign-in, `calendar.readonly` + offline access for Calendar — not configured on the
    client, so the one client serves both.
 
+Reference: [Google OAuth overview](https://developers.google.com/workspace/guides/auth-overview)
+
+### WHOOP
+
+Register a developer app at [developer.whoop.com](https://developer.whoop.com/docs/developing/overview),
+set the redirect URI to `http://localhost:3000/api/integrations/whoop/callback`, and
+copy the client credentials into `.env.local`.
+
 ```sh
 # .env.example
 # One Google OAuth client, used by both Better Auth sign-in and the Calendar integration
@@ -29,6 +39,43 @@ GOOGLE_CLIENT_SECRET=
 # WHOOP integration
 WHOOP_CLIENT_ID=
 WHOOP_CLIENT_SECRET=
+```
+
+### Local Development
+
+#### Prerequisites
+- [Node.js](https://nodejs.org/en/download) installed
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) running
+- [Supabase CLI](https://supabase.com/docs/guides/cli/getting-started) installed
+
+```bash
+node --version       # confirm install
+supabase --version   # confirm install
+docker info          # confirm Docker is running
+```
+
+#### First-time setup
+
+```bash
+supabase init        # creates supabase/ config folder — commit this
+supabase start       # pulls images (~1.5 GB), starts full local stack
+```
+
+`supabase start` prints your local keys — paste the `publishable key` and
+`secret key` into `.env.local`. The URLs and DB credentials are
+already pre-filled with the correct local defaults.
+
+#### Apply schema
+
+```bash
+npm install
+npm run db:migrate      # applies migrations to the local Supabase instance
+```
+
+#### Start the app
+
+```bash
+npm run dev             # → http://localhost:3000
 ```
 
 ## High-level architecture & design
@@ -42,9 +89,9 @@ so they are a cache we regenerate, never a record we patch.
 | Entity | Treatment | Why |
 |---|---|---|
 | **User** | Persisted — source of record | The single connected identity, **created by Better Auth at sign-in** (Google social login) — there is no app-owned create-user route. Authoritative; can't be recomputed. |
-| **Integration** | Persisted — source of record | One linked service, modeled by **category** (`calendar` \| `health`) + provider id, holding OAuth tokens, refresh expiry, and the sync cursor. A category-tagged row, not a provider registry. |
+| **Integration** | Persisted — source of record | One linked service, modeled by **category** (`calendar` \| `health`) + provider id, holding OAuth tokens and refresh expiry. A category-tagged row, not a provider registry. |
 | **CalendarSelection** | Persisted — source of record | One **owned** calendar the user has included (primary pre-selected). **Presence = included** — we persist only the user's choice, never a mirror of every calendar; the available list is fetched live from the provider, so there is no `selected` flag. `name` is a cached label for display. Belongs to a calendar Integration. |
-| **Report** | Persisted — derived snapshot | The output of one generation run: the fused daily timeline + computed metrics/correlations that back its charts, plus the AI Insights. Carries a `status` (`pending` \| `ready` \| `error`) and a `generatedFrom` fingerprint (sources + window + `generatedAt`). **Latest-only for the MVP; regenerated wholesale, never patched.** |
+| **Report** | Persisted — derived snapshot | The output of one generation run: the fused daily timeline + computed metrics/correlations that back its charts, plus the AI Insights. Stored as a single `data` JSON blob alongside `windowStart`/`windowEnd` and an `integrationSnapshotAt` timestamp — the fingerprint used to detect staleness at read time. **Latest-only for the MVP; regenerated wholesale, never patched.** |
 
 Computed during a run, never stored. A generation run is a pipeline — fetch from the providers, reduce to metrics, hand those to the AI — and its intermediate values live only in
 memory. None are database tables: the raw events and cycles pulled from Google and WHOOP; the evidence packet, the deterministic metrics derived from them and the only thing the AI
@@ -84,34 +131,31 @@ erDiagram
 
     Report {
         uuid id
-        uuid userId
+        string userId
 
-        string status
+        json data
 
+        date windowStart
+        date windowEnd
         datetime generatedAt
-
-        json metrics
-        json insights
-        json generatedFrom
+        datetime integrationSnapshotAt
     }
 ```
 
 ### APIs
 
-Sign-in and OAuth login are Better Auth's `/api/auth/*` handler; the user's timezone
-is captured at sign-in by a server action, not a REST route. The app's own surface:
+Sign-in is handled by Better Auth's `/api/auth/*` handler. Integration status and
+the calendar list are read directly in Server Components — no REST route needed.
+The app's own REST surface:
 
 ```
-GET    /api/integrations                              # connected services + status (drives tiers UI)
-
-POST   /api/integrations/google-calendar/connect      # begin OAuth
+GET    /api/integrations/google-calendar/connect      # begin OAuth (redirects to Google)
 GET    /api/integrations/google-calendar/callback
 
-POST   /api/integrations/whoop/connect
-GET    /api/integrations/whoop/callback
+POST   /api/integrations/google-calendar/selections   # update calendar selection → triggers regeneration
 
-GET    /api/calendars                                 # owned calendars, for selection
-PUT    /api/calendars                                 # change selection → triggers regeneration
+GET    /api/integrations/whoop/connect                # begin OAuth (redirects to WHOOP)
+GET    /api/integrations/whoop/callback
 
 GET    /api/report                                    # report + status; regenerates if missing / stale / errored
 ```
@@ -137,19 +181,18 @@ subgraph Backend["Backend Service (Modular Monolith)"]
 
     subgraph UserModule["User Module"]
         Auth["Better Auth"]
-        UserService["User Service"]
     end
 
     subgraph IntegrationModule["Integration Module"]
 
-        IntegrationService["Integration Service"]
-
         subgraph CalendarCategory["Calendar Category"]
-            GoogleAdapter["Google Calendar Adapter"]
+            CalendarService["Calendar Service"]
+            GoogleCalendarClient["Google Calendar Client"]
         end
 
         subgraph HealthCategory["Health Category"]
-            WhoopAdapter["WHOOP Adapter"]
+            WhoopService["WHOOP Service"]
+            WhoopClient["WHOOP Client"]
         end
 
         CalendarSelection["Calendar Selection Management"]
@@ -171,7 +214,7 @@ DB[("Postgres")]
 
 Google["Google Calendar API"]
 Whoop["WHOOP API"]
-OpenAI["OpenAI API"]
+AISDK["AI SDK"]
 
 User --> Frontend
 
@@ -179,26 +222,27 @@ Home --> Backend
 ReportUI --> Backend
 
 Auth --> DB
-UserService --> DB
 
-IntegrationService --> DB
+CalendarService --> DB
 CalendarSelection --> DB
+WhoopService --> DB
 
 ReportService --> DB
 
-IntegrationService --> GoogleAdapter
-IntegrationService --> WhoopAdapter
+CalendarService --> GoogleCalendarClient
+WhoopService --> WhoopClient
 
-GoogleAdapter --> Google
-WhoopAdapter --> Whoop
+GoogleCalendarClient --> Google
+WhoopClient --> Whoop
 
 ReportService --> Timeline
 Timeline --> Metrics
 Metrics --> AI
 
-AI --> OpenAI
+AI --> AISDK
 
-IntegrationService --> ReportService
+CalendarService --> ReportService
+WhoopService --> ReportService
 ```
 
 ## Brief on your AI implementation
@@ -250,7 +294,7 @@ without passing that gate.
 - **Small sample by design.** The 30-day rolling window means `n` is genuinely
   small (~26 usable days). The AI is instructed to reason honestly about this, but
   findings will often be low confidence.
-- **Single user, no report history.** One report per user; the `reports` table grows
+- **No report history.** One visible report per user; the `reports` table grows
   one row per generation (latest is always read). No versioning, no trend across reports.
 - **Concurrent tab generation.** If two browser tabs open simultaneously on a day when
   the report needs regenerating, both trigger independent AI calls. The second call's
@@ -278,15 +322,16 @@ without passing that gate.
 - **~1 day:**
     - basic app functionality (e.g. log out, better navigation)
     - improved calendar categorization
-    - weekly reports or selectable time ranges (e.g. last 7/14/30/60 days)?
+    - weekly reports or selectable time ranges (e.g. last 7/14/30/60 days)
+    - prevent concurrent tab report generation
 - **~5 days:**
-    - review security posture
-    - trend analysis (e.g. last 30 days vs previous 30 days)
+    - async report pipeline
     - insight history
-    - correlation visualizations
     - multi-calendar selection across multiple Google accounts
 - **~20 days:**
-    - productionization integration OAuth apps
+    - trend analysis (e.g. last 30 days vs previous 30 days)
+    - correlation visualizations
+    - productionize OAuth apps (Google verification, WHOOP developer review)
     - consider additional integrations of existing categories (e.g. health: Strava)
-    - consider additional integrations categorises (e.g. time tracker: Toggl)
+    - consider additional integration categories (e.g. time tracker: Toggl)
     - consider additional sign in providers
