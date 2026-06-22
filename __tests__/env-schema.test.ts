@@ -8,6 +8,8 @@ const serverSchema = z.object({
   BETTER_AUTH_URL: z.string().url(),
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
+  WHOOP_CLIENT_ID: z.string().min(1),
+  WHOOP_CLIENT_SECRET: z.string().min(1),
 })
 
 const validEnv = {
@@ -17,6 +19,8 @@ const validEnv = {
   BETTER_AUTH_URL: 'http://localhost:3000',
   GOOGLE_CLIENT_ID: 'client-id-123',
   GOOGLE_CLIENT_SECRET: 'client-secret-456',
+  WHOOP_CLIENT_ID: 'whoop-client-id',
+  WHOOP_CLIENT_SECRET: 'whoop-client-secret',
 }
 
 describe('server env schema', () => {
@@ -56,6 +60,22 @@ describe('server env schema', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.issues.some((i) => i.path.includes('GOOGLE_CLIENT_ID'))).toBe(true)
+    }
+  })
+
+  it('rejects WHOOP_CLIENT_ID as empty string', () => {
+    const result = serverSchema.safeParse({ ...validEnv, WHOOP_CLIENT_ID: '' })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues.some((i) => i.path.includes('WHOOP_CLIENT_ID'))).toBe(true)
+    }
+  })
+
+  it('rejects WHOOP_CLIENT_SECRET as empty string', () => {
+    const result = serverSchema.safeParse({ ...validEnv, WHOOP_CLIENT_SECRET: '' })
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.issues.some((i) => i.path.includes('WHOOP_CLIENT_SECRET'))).toBe(true)
     }
   })
 })
