@@ -9,3 +9,8 @@ export {
   IntegrationNotFoundError,
   NoSelectionsError,
 } from './calendar/calendarService';
+export {
+  getWhoopConnectionStatus,
+  saveWhoopTokens,
+  fetchRawDataForWindow,
+} from './whoop/whoopService';

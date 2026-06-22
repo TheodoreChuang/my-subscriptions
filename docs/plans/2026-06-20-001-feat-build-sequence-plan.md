@@ -169,15 +169,256 @@ These run alongside the slices below; start them at day 1, not when their slice 
 
 ---
 
+## S7–S9 pipeline & interface design
+
+Recorded after an architecture review (2026-06-22). Details the data structures,
+seam contracts, and mechanics that span S7, S8, and S9. Per-slice file lists and
+test scenarios are still produced when each slice is planned.
+
+### Full data-flow chain
+
+```
+fetchEventsForWindow(userId)          →  RawCalendarEvent[]
+fetchRawDataForWindow(userId)         →  WhoopRawData { cycles, sleeps, recoveries }
+         ↓
+normalizeCalendarEvents()             →  CalendarDaySignal[] (date → { activities, eventCount })
+normalizeWhoopCycles()                →  WhoopDaySignal[]   (date → { recovery, sleepHours, strain })
+         ↓
+joinSignals()                         →  DaySummary[]       (common timeline spine)
+         ↓
+computeMetrics(daySummaries)          →  AnalysisMetrics    (n + confidence per delta)
+identifyCandidateSignals()            →  CandidateSignal[]  (notable patterns; AI interprets these)
+         ↓
+buildEvidencePacket()                 →  EvidencePacket     (compact; never raw events)
+         ↓
+generateInsights(evidencePacket)      →  { executiveSummary, weekHighlightSummaries, findings }
+         ↓
+assembleReport() → reportSchema.parse() → upsert into reports table → return Report
+```
+
+The two provider fetches are independent and must run in parallel. The AI call is
+the final blocking step; everything before it is deterministic.
+
+### S7 → S8 seam — candidate signals, not findings
+
+S7 enumerates *candidate signals* (notable deltas with n + uncertainty); S8's AI
+decides which candidates become findings and may surface zero (Technique 4).
+S7 does not know what findings will result — it knows what the data shows.
+
+### Normalization layer (internal to S7, not exported)
+
+```ts
+// internal — modules/report/normalize.ts
+
+type WhoopDaySignal = {
+  date: string           // YYYY-MM-DD in UTC (see Decisions — Timezone)
+  recovery: number | null
+  sleepHours: number | null
+  strain: number | null
+}
+
+type CalendarDaySignal = {
+  date: string
+  activities: Record<string, number>  // category → hours
+  eventCount: number
+}
+```
+
+**WHOOP normalization rules** (all from spike findings):
+- Join hub: `recovery.cycle_id → cycle`, `sleep.cycle_id → cycle`
+- Date: `new Date(cycle.start)` → extract UTC date as YYYY-MM-DD (ignore `timezone_offset` for MVP)
+- Filter: `score_state === "SCORED"` on both cycle and recovery; `nap === false` on sleep
+- `sleepHours`: `(total_in_bed_time_milli - total_awake_time_milli) / 3_600_000`
+- Double-cycle days: take the cycle with the latest `cycle.start` (after nap filtering)
+- In-progress cycle (`end: null`): skip
+
+**Calendar normalization rules:**
+- All-day events: `start.date` present → duration = 1 day, assign to that date
+- Timed events: `start.dateTime` → parse as UTC, assign to UTC date (ignore `start.timeZone` for MVP)
+- Filter: `status !== "cancelled"`
+- Categorize by event title → keyword rules → category → accumulate hours
+- Initial categories: Work · Exercise · Family · Social · Learning · Travel · Personal · Rest
+
+### Evidence packet (what goes to the AI)
+
+Do not send all 30 `DaySummary` rows to the AI — that bloats tokens and invites
+re-derivation. Send pre-computed metrics + a small number of named exemplar days +
+the candidate signals S7 already identified.
+
+```ts
+// modules/report/evidencePacket.ts
+
+type CandidateSignal = {
+  description: string   // e.g. "Exercise days show +9.2% recovery (n=14, strong)"
+  n: number
+  deltaPercent: number
+  confidence: "strong" | "weak" | "insufficient"
+}
+
+type EvidencePacket = {
+  window: { start: string; end: string; days: number }
+  coverageDays: number
+  connectedSources: ConnectedSource[]
+  metrics: AnalysisMetrics
+  exemplarDays: {
+    highest: { date: string; recovery: number; activities: Record<string, number> }
+    lowest:  { date: string; recovery: number; activities: Record<string, number> }
+  } | null                // null when health not connected
+  weekStats: Array<{
+    label: string         // "Best week" / "Worst week"
+    dateRange: string     // "Jun 2–8"
+    recoveryPercent: number  // deterministic avg — AI fills in the prose summary
+  }>
+  candidateSignals: CandidateSignal[]
+}
+```
+
+### AI output sub-contract
+
+The AI emits *only* these fields, validated against a narrow sub-schema before
+being merged with the deterministic fields (Invariant #7):
+
+```ts
+// shared/schemas/report.ts — add alongside reportSchema
+
+export const aiOutputSchema = z.object({
+  executiveSummary: z.string().min(1).max(2000),
+  weekHighlightSummaries: z.array(z.string()),  // one per weekStats entry, in order
+  findings: z.array(findingSchema).min(0).max(5),
+})
+```
+
+The assembled `weekHighlights` array merges deterministic stats with AI prose:
+
+```ts
+weekHighlights: weekStats.map((w, i) => ({
+  ...w,
+  summary: aiOutput.weekHighlightSummaries[i] ?? "",
+}))
+```
+
+### Report persistence (new — needed by S8)
+
+New `reports` table. One row per user, upserted on every generation run.
+
+```sql
+CREATE TABLE reports (
+  id                      uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id                 text NOT NULL REFERENCES users(id),
+  data                    jsonb NOT NULL,
+  window_start            date NOT NULL,
+  window_end              date NOT NULL,
+  generated_at            timestamptz NOT NULL,
+  integration_snapshot_at timestamptz NOT NULL,
+  created_at              timestamptz NOT NULL DEFAULT now()
+);
+CREATE UNIQUE INDEX reports_user_id_idx ON reports (user_id);
+```
+
+`integration_snapshot_at` = `max(updated_at)` across all integration rows at
+generation time. Staleness detection compares this to the current
+`max(updated_at)` on every report read.
+
+```ts
+interface ReportRepository {
+  getReport(userId: string): Promise<StoredReport | null>
+  saveReport(userId: string, report: Report, integrationSnapshotAt: Date): Promise<void>
+}
+
+type StoredReport = {
+  report: Report
+  integrationSnapshotAt: Date
+}
+```
+
+### S9 — staleness detection + pipeline trigger
+
+```ts
+type ReportStatus =
+  | { status: 'current'; report: Report }
+  | { status: 'needs_generation'; reason: 'no_report' | 'window_drift' | 'integration_changed' }
+
+function checkReportStatus(
+  stored: StoredReport | null,
+  currentIntegrationAt: Date,
+  windowEndExpected: string,  // the end date a current 30-day window should have
+): ReportStatus {
+  if (!stored)
+    return { status: 'needs_generation', reason: 'no_report' }
+  if (stored.report.window.end !== windowEndExpected)
+    return { status: 'needs_generation', reason: 'window_drift' }
+  if (currentIntegrationAt > stored.integrationSnapshotAt)
+    return { status: 'needs_generation', reason: 'integration_changed' }
+  return { status: 'current', report: stored.report }
+}
+```
+
+`currentIntegrationAt` must also move when calendar selections change — either
+update the integration row's `updated_at` on selection change, or store a
+separate `lastSelectionChangedAt` per user.
+
+**Concurrent regeneration guard:** `saveReport` must be an upsert keyed on
+`user_id`. Two tabs opening on a new day will both detect drift and race to
+generate; the upsert ensures only one report row exists and the second write
+simply overwrites the first. Consider a short-circuit: if a report row was
+written within the last N seconds, skip re-generation.
+
+### Tier gating — safety boundary, not UX rule
+
+Connection tier (one source vs. two) must be decided *before* fetch and must
+control which metrics are computed and what the AI prompt contains.
+
+- **Calendar only:** skip WHOOP fetch; compute activity metrics only; AI prompt
+  must not reference health or cross-source relationships.
+- **WHOOP only:** skip Calendar fetch; compute recovery/sleep trends only; AI
+  prompt must not reference schedule or cross-source relationships.
+- **Both:** full pipeline; cross-source correlations and AI relationship framing
+  are enabled.
+
+Running cross-service correlation interpretation with only one source
+manufactures a relationship from nothing — a direct Technique 4 violation. The
+gate is on computation and the AI prompt, not only on display.
+
+---
+
 ## Risks to watch (across slices)
 
-- **Synchronous-pipeline latency** (S9) — retrieve+normalize+metrics+AI must fit the
-  request budget; validate as soon as S7–S8 land.
+- **Synchronous-pipeline latency** (S9) — retrieve+normalize+metrics+AI must fit
+  the request budget. Vercel Hobby cap is 60 s; Pro is 300 s — name and document
+  the actual ceiling before S9 lands. Validate end-to-end latency the moment S7
+  and S8 exist, not at the end.
 - **Google verification lead time** — parallel track; gates real (non-dev) users.
 - **Report-contract churn** — mitigated by designing the contract at S2–S3 against
-  S7–S8 output shapes.
+  S7–S8 output shapes. One known amendment needed pre-S7: see Open Decisions #1.
 - **Spike open-questions** (all-day events, recurring expansion, large-window
   multi-calendar pagination) — resolve when S5 is planned.
+- **Concurrent regeneration** (S9) — two browser tabs opening on a new day both
+  detect drift; guard with upsert semantics and a short-circuit on recent writes.
+
+---
+
+## Decisions (resolved 2026-06-22)
+
+### Decision 1 — `activityRecoveryDeltaSchema` amendment ✅
+
+`n` and `confidence` fields added to the schema. This is the only amendment to
+the contract locked at S3.
+
+### Decision 2 — Timezone ✅
+
+**Use UTC for the MVP.** Do not derive timezone from any integration — that would
+couple date bucketing to whichever provider happens to be connected. The report
+covers a rolling 30-day window the user never selects manually, so exact timezone
+alignment is low-stakes for now. All date strings (`DaySummary.date`, window
+start/end, cycle→date mapping, event→date bucketing) are UTC.
+
+If per-user timezone is ever needed: add a `timezone` column to the `users` table
+at that point and update the normalization layer — no other layer changes.
+
+### Decision 3 — Vercel function timeout ✅
+
+Deferred. Build the pipeline first; measure end-to-end latency when S7 and S8
+exist; optimize only if latency exceeds the request budget in practice.
 
 ---
 

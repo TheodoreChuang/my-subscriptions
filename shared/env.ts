@@ -26,6 +26,8 @@ const serverSchema = z.object({
   BETTER_AUTH_URL: z.string().url(),
   GOOGLE_CLIENT_ID: z.string().min(1),
   GOOGLE_CLIENT_SECRET: z.string().min(1),
+  WHOOP_CLIENT_ID: z.string().min(1),
+  WHOOP_CLIENT_SECRET: z.string().min(1),
 })
 
 // NEXT_PUBLIC_ vars — safe to expose to the browser. Empty for S1.
